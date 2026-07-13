@@ -56,7 +56,7 @@
         @media (max-width: 768px) { .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-8, .col-md-9 { width: 100%; } }
         .mb-2 { margin-bottom: 0.5rem; } .mb-3 { margin-bottom: 1rem; } .mb-4 { margin-bottom: 1.5rem; } .w-100 { width: 100%; }
         
-        .auth-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .auth-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
         .app-shell { min-height: 100vh; display: flex; overflow: hidden; }
         
         .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05); }
@@ -193,7 +193,7 @@
         <div class="absolute top-1/4 left-1/4 w-72 h-72 bg-primary/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
         <div class="absolute top-1/3 right-1/4 w-72 h-72 bg-purple-300/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
 
-        <div class="glass p-8 rounded-[2rem] w-full max-w-[380px] relative z-10 mx-4">
+        <div class="glass p-8 rounded-[2rem] w-full max-w-[420px] relative z-10 mx-4">
             <div class="text-center mb-6">
                 <div class="bg-primary/10 w-20 h-20 rounded-full mx-auto flex items-center justify-center mb-4 shadow-inner">
                     <span class="material-symbols-rounded text-[40px] text-primary">school</span>
@@ -203,8 +203,28 @@
             </div>
             
             <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="row mb-4">
+                    <div class="col-6">
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Tahun Ajaran</label>
+                        <select id="loginTahunAjaran" class="form-control" required>
+                            <option value="2026-2027" selected>2026/2027</option>
+                            <option value="2027-2028">2027/2028</option>
+                            <option value="2028-2029">2028/2029</option>
+                            <option value="2029-2030">2029/2030</option>
+                            <option value="2030-2031">2030/2031</option>
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Semester</label>
+                        <select id="loginSemester" class="form-control" required>
+                            <option value="Ganjil" selected>Ganjil</option>
+                            <option value="Genap">Genap</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="mb-4">
-                    <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Username</label>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Username / Email</label>
                     <div class="relative">
                         <span class="material-symbols-rounded absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">person</span>
                         <input type="text" id="username" class="form-control pl-10" required autocomplete="username">
@@ -228,7 +248,6 @@
     <section id="mainApp" class="app-shell d-none">
         <div class="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-50 d-none md:hidden" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-        <!-- Sidebar Utama -->
         <aside class="sidebar glass" id="sidebar">
             <div class="p-5 flex items-center justify-between mt-1">
                 <div class="flex items-center gap-3 overflow-hidden">
@@ -264,7 +283,6 @@
         </aside>
 
         <main class="main-content pb-20 md:pb-0">
-            <!-- Header Konten Utama -->
             <header class="sticky top-0 z-30 glass px-5 py-3 flex justify-between items-center shadow-sm">
                 <div class="flex items-center gap-3">
                     <button id="btnShowSidebar" class="btn-icon bg-white/50 text-slate-600 border-none md:hidden" onclick="toggleSidebar()" title="Tampilkan Menu">
@@ -274,6 +292,7 @@
                     <div class="hidden sm:block">
                         <strong id="topbarSekolah" class="text-lg font-extrabold text-slate-800 tracking-tight">ZeroEdu</strong>
                         <span class="ml-2 inline-block px-2 py-0.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 rounded-full text-[10px] font-bold uppercase tracking-wide">Workspace</span>
+                        <span id="topbarSemester" class="ml-1 inline-block px-2 py-0.5 bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400 rounded-full text-[10px] font-bold uppercase tracking-wide">-</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
@@ -287,7 +306,6 @@
                     <div class="w-9 h-9 rounded-full bg-primaryContainer text-primary dark:bg-primary/20 dark:border-slate-800 flex items-center justify-center font-extrabold text-lg shadow-inner border-2 border-white">
                         <span id="topbarInitial" class="text-primary">-</span>
                     </div>
-                    <!-- TOMBOL KELUAR -->
                     <button onclick="logout()" class="btn-icon bg-rose-50 text-rose-600 border border-rose-200/50 shadow-sm shrink-0 w-9 h-9 hover:bg-rose-100 dark:bg-rose-500/20 dark:border-rose-500/30 dark:text-rose-400 dark:hover:bg-rose-500/30" title="Keluar">
                         <span class="material-symbols-rounded text-[20px]">power_settings_new</span>
                     </button>
@@ -296,7 +314,6 @@
 
             <div class="p-5 md:p-6 flex-grow">
                 
-                <!-- DASHBOARD -->
                 <div id="page-dashboard" class="app-page">
                     <div class="rounded-[1.25rem] p-6 md:p-8 mb-6 text-white relative overflow-hidden shadow-sm flex flex-col justify-center min-h-[180px]" style="background-color: var(--md-sys-color-primary);">
                         <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-20 mix-blend-overlay pointer-events-none"></div>
@@ -353,7 +370,6 @@
                     </div>
                 </div>
 
-                <!-- PAGE SISWA -->
                 <div id="page-siswa" class="app-page d-none">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                         <div class="flex items-center gap-3">
@@ -414,7 +430,6 @@
                     </div>
                 </div>
 
-                <!-- PAGE JADWAL -->
                 <div id="page-jadwal" class="app-page d-none">
                     <div class="flex items-center mb-6 gap-3"><div class="bg-white/50 p-1.5 rounded-lg shadow-sm border border-white"><span class="material-symbols-rounded text-2xl text-primary block">event_note</span></div><h4 class="mb-0 font-extrabold text-2xl text-slate-800 tracking-tight">Jadwal Mengajar</h4></div>
                     <ul class="nav-tabs text-sm">
@@ -433,7 +448,6 @@
                     </div>
                 </div>
 
-                <!-- PAGE PIKET -->
                 <div id="page-piket" class="app-page d-none">
                     <div class="flex items-center mb-6 gap-3"><div class="bg-white/50 p-1.5 rounded-lg shadow-sm border border-white"><span class="material-symbols-rounded text-2xl text-primary block">cleaning_services</span></div><h4 class="mb-0 font-extrabold text-2xl text-slate-800 tracking-tight">Jadwal Piket</h4></div>
                     <div class="custom-card mb-5">
@@ -458,7 +472,6 @@
                     </div>
                 </div>
 
-                <!-- PAGE ABSENSI -->
                 <div id="page-absensi" class="app-page d-none">
                     <div class="flex items-center mb-6 gap-3"><div class="bg-white/50 p-1.5 rounded-lg shadow-sm border border-white"><span class="material-symbols-rounded text-2xl text-primary block">how_to_reg</span></div><h4 class="mb-0 font-extrabold text-2xl text-slate-800 tracking-tight">Presensi Kehadiran</h4></div>
                     <ul class="nav-tabs text-sm">
@@ -474,7 +487,6 @@
                     </div><div class="table-responsive"><table class="table text-center text-sm"><thead id="ab_rekap_head"></thead><tbody id="ab_rekap_body"><tr><td class="text-center text-slate-400 py-4 italic">Pilih bulan untuk melihat rekap</td></tr></tbody></table></div></div></div>
                 </div>
 
-                <!-- PAGE TABUNGAN -->
                 <div id="page-tabungan" class="app-page d-none">
                     <div class="flex items-center mb-6 gap-3"><div class="bg-white/50 p-1.5 rounded-lg shadow-sm border border-white"><span class="material-symbols-rounded text-2xl text-primary block">savings</span></div><h4 class="mb-0 font-extrabold text-2xl text-slate-800 tracking-tight">Tabungan Kelas</h4></div>
                     <ul class="nav-tabs text-sm">
@@ -492,7 +504,6 @@
                     <button class="btn btn-sm bg-blue-100 text-blue-700 hover:bg-blue-200 border-none shadow-sm dark:bg-blue-900/40 dark:text-blue-300 dark:hover:bg-blue-900/60" onclick="exportRekapTabungan()"><span class="material-symbols-rounded mr-1 text-sm">download</span> Ekspor</button></div><div class="table-responsive pt-2"><table class="table text-sm"><thead><tr><th class="text-center w-12">No</th><th>Nama Nasabah</th><th class="text-right text-emerald-600">Total Setoran</th><th class="text-right text-rose-600">Total Tarikan</th><th class="text-right font-extrabold text-primary">Saldo Bersih</th></tr></thead><tbody id="tblTabunganRekap"></tbody></table></div></div></div>
                 </div>
 
-                <!-- PAGE NILAI -->
                 <div id="page-nilai" class="app-page d-none">
                     <div class="flex items-center mb-6 gap-3">
                         <div class="bg-white/50 p-1.5 rounded-lg shadow-sm border border-white"><span class="material-symbols-rounded text-2xl text-primary block">stars</span></div>
@@ -607,48 +618,41 @@
                     </div>
                 </div>
 
-                <!-- PAGE JURNAL -->
                 <div id="page-jurnal" class="app-page d-none">
                     <div class="flex items-center mb-6 gap-3"><div class="bg-white/50 p-1.5 rounded-lg shadow-sm border border-white"><span class="material-symbols-rounded text-2xl text-primary block">menu_book</span></div><h4 class="mb-0 font-extrabold text-2xl text-slate-800 tracking-tight">Jurnal Harian</h4></div>
                     <div class="row">
                         <div class="col-md-4 mb-4"><div class="custom-card"><div class="custom-card-header bg-white/40 rounded-t-[1.25rem]">Tulis Jurnal</div><div class="custom-card-body pt-3 text-sm"><form onsubmit="saveJurnal(event)"><input type="hidden" id="jr_id"><div class="mb-3"><label class="mb-1 block font-bold ml-1">Tanggal</label><input type="date" id="jr_tgl" class="form-control bg-white" required></div><div class="mb-3"><label class="mb-1 block font-bold ml-1">Mapel</label><select id="jr_mapel" class="form-select bg-white" required></select></div><div class="mb-3"><label class="mb-1 block font-bold ml-1">Materi</label><input type="text" id="jr_materi" class="form-control bg-white" required></div><div class="mb-3"><label class="mb-1 block font-bold ml-1">Aktivitas</label><textarea id="jr_kegiatan" class="form-control bg-white" rows="3" required></textarea></div><div class="mb-4"><label class="mb-1 block font-bold ml-1">Keterangan</label><input type="text" id="jr_ket" class="form-control bg-white" placeholder="-"></div><button type="submit" class="btn btn-primary w-full shadow-sm py-2">Simpan Jurnal</button></form></div></div></div>
                         <div class="col-md-8"><div class="custom-card"><div class="custom-card-header flex justify-between items-center bg-white/40 rounded-t-[1.25rem]"><span>Rekap Jurnal</span>
-                        <button class="btn btn-sm bg-blue-100 text-blue-700 hover:bg-blue-200 border-none shadow-sm dark:bg-blue-900/40 dark:text-blue-300 dark:hover:bg-blue-900/60" onclick="exportJurnal()"><span class="material-symbols-rounded mr-1 text-sm">download</span> Ekspor</button></div><div class="table-responsive pt-2"><table class="table text-sm"><thead><tr><th class="w-24">Tanggal</th><th class="w-32">Mapel</th><th>Materi & Kegiatan</th><th>Status</th><thead><tr><th class="w-24">Tanggal</th><th class="w-32">Mapel</th><th>Materi & Kegiatan</th><th>Status</th><th class="text-center w-24">Aksi</th></tr></thead><tbody id="tblJurnal"><tr><td colspan="5" class="text-center text-slate-400 py-4 italic">Belum ada jurnal</td></tr></tbody></table></div></div></div>
+                        <button class="btn btn-sm bg-blue-100 text-blue-700 hover:bg-blue-200 border-none shadow-sm dark:bg-blue-900/40 dark:text-blue-300 dark:hover:bg-blue-900/60" onclick="exportJurnal()"><span class="material-symbols-rounded mr-1 text-sm">download</span> Ekspor</button></div><div class="table-responsive pt-2"><table class="table text-sm"><thead><tr><th class="w-24">Tanggal</th><th class="w-32">Mapel</th><th>Materi & Kegiatan</th><th>Status</th><th class="text-center w-24">Aksi</th></tr></thead><tbody id="tblJurnal"><tr><td colspan="5" class="text-center text-slate-400 py-4 italic">Belum ada jurnal</td></tr></tbody></table></div></div></div>
                     </div>
                 </div>
 
-                <!-- PAGE CATATAN -->
                 <div id="page-catatan" class="app-page d-none">
                     <div class="flex items-center mb-6 gap-3"><div class="bg-white/50 p-1.5 rounded-lg shadow-sm border border-white"><span class="material-symbols-rounded text-2xl text-primary block">fact_check</span></div><h4 class="mb-0 font-extrabold text-2xl text-slate-800 tracking-tight">Catatan Anekdotal</h4></div>
                     <div class="row">
                         <div class="col-md-4 mb-4"><div class="custom-card"><div class="custom-card-header bg-white/40 rounded-t-[1.25rem]">Input Catatan</div><div class="custom-card-body pt-3 text-sm"><form onsubmit="saveCatatan(event)"><input type="hidden" id="ct_id"><div class="mb-3"><label class="mb-1 block font-bold ml-1">Tanggal</label><input type="date" id="ct_tgl" class="form-control bg-white" required></div><div class="mb-3"><label class="mb-1 block font-bold ml-1">Nama Siswa</label><select id="ct_siswa" class="form-select bg-white" required></select></div><div class="mb-4"><label class="mb-1 block font-bold ml-1">Kejadian</label><textarea id="ct_teks" class="form-control bg-white" rows="4" required></textarea></div><button type="submit" class="btn btn-primary w-full shadow-sm py-2">Simpan</button></form></div></div></div>
                         <div class="col-md-8"><div class="custom-card"><div class="custom-card-header flex justify-between items-center bg-white/40 rounded-t-[1.25rem]"><span>Buku Kasus/Prestasi</span>
-                        <button class="btn btn-sm bg-blue-100 text-blue-700 hover:bg-blue-200 border-none shadow-sm dark:bg-blue-900/40 dark:text-blue-300 dark:hover:bg-blue-900/60" onclick="exportCatatan()"><span class="material-symbols-rounded mr-1 text-sm">download</span> Ekspor</button></div><div class="table-responsive pt-2"><table class="table text-sm"><thead><tr><th class="w-24">Tanggal</th><th class="w-40">Siswa</th><th>Uraian</th><th class="text-center w-24">Aksi</th></tr></thead></tr></thead><tbody id="tblCatatan"><tr><td colspan="4" class="text-center text-slate-400 py-4 italic">Belum ada catatan</td></tr></tbody></table></div></div></div>
+                        <button class="btn btn-sm bg-blue-100 text-blue-700 hover:bg-blue-200 border-none shadow-sm dark:bg-blue-900/40 dark:text-blue-300 dark:hover:bg-blue-900/60" onclick="exportCatatan()"><span class="material-symbols-rounded mr-1 text-sm">download</span> Ekspor</button></div><div class="table-responsive pt-2"><table class="table text-sm"><thead><tr><th class="w-24">Tanggal</th><th class="w-40">Siswa</th><th>Uraian</th><th class="text-center w-24">Aksi</th></tr></thead><tbody id="tblCatatan"><tr><td colspan="4" class="text-center text-slate-400 py-4 italic">Belum ada catatan</td></tr></tbody></table></div></div></div>
                     </div>
                 </div>
 
-                <!-- PAGE INVENTARIS -->
                 <div id="page-inventaris" class="app-page d-none">
                     <div class="flex items-center mb-6 gap-3"><div class="bg-white/50 p-1.5 rounded-lg shadow-sm border border-white"><span class="material-symbols-rounded text-2xl text-primary block">inventory_2</span></div><h4 class="mb-0 font-extrabold text-2xl text-slate-800 tracking-tight">Inventaris Kelas</h4></div>
                     <div class="row">
                         <div class="col-md-4 mb-4"><div class="custom-card"><div class="custom-card-header bg-white/40 rounded-t-[1.25rem]">Input Barang</div><div class="custom-card-body pt-3 text-sm"><form onsubmit="saveInventaris(event)"><input type="hidden" id="iv_id"><div class="mb-3"><label class="mb-1 block font-bold ml-1">Nama Barang</label><input type="text" id="iv_nama" class="form-control bg-white" required></div><div class="row"><div class="col-6 mb-3"><label class="mb-1 block font-bold ml-1">Jumlah</label><input type="number" id="iv_jml" class="form-control bg-white text-center" required></div><div class="col-6 mb-3"><label class="mb-1 block font-bold ml-1">Tahun</label><input type="number" id="iv_thn" class="form-control bg-white text-center" value="2026"></div></div><div class="mb-3"><label class="mb-1 block font-bold ml-1">Kondisi</label><select id="iv_kondisi" class="form-select bg-white"><option>Baik</option><option>Rusak Ringan</option><option>Rusak Berat</option></select></div><div class="mb-3"><label class="mb-1 block font-bold ml-1">Sumber</label><select id="iv_sumber" class="form-select bg-white"><option>BOS</option><option>Hibah</option><option>Mandiri</option></select></div><div class="mb-4"><label class="mb-1 block font-bold ml-1">Keterangan</label><input type="text" id="iv_ket" class="form-control bg-white" placeholder="-"></div><button type="submit" class="btn btn-primary w-full shadow-sm py-2">Simpan</button></form></div></div></div>
                         <div class="col-md-8"><div class="custom-card"><div class="custom-card-header flex justify-between items-center bg-white/40 rounded-t-[1.25rem]"><span>Daftar Inventaris</span>
-                        <button class="btn btn-sm bg-blue-100 text-blue-700 hover:bg-blue-200 border-none shadow-sm dark:bg-blue-900/40 dark:text-blue-300 dark:hover:bg-blue-900/60" onclick="exportInventaris()"><span class="material-symbols-rounded mr-1 text-sm">download</span> Ekspor</button></div><div class="table-responsive pt-2"><table class="table text-sm"><thead><tr><th>Barang</th><th class="text-center">Jml</th><th>Kondisi</th><th>Sumber</th><th class="text-center">Thn</th><th>Ket</th></tr></thead><tbody id="tblInventaris"><tr><td colspan="7" class="text-center text-slate-400 py-4 italic">Belum ada barang diinventarisasi</td></tr></tbody></table></div></div></div>
+                        <button class="btn btn-sm bg-blue-100 text-blue-700 hover:bg-blue-200 border-none shadow-sm dark:bg-blue-900/40 dark:text-blue-300 dark:hover:bg-blue-900/60" onclick="exportInventaris()"><span class="material-symbols-rounded mr-1 text-sm">download</span> Ekspor</button></div><div class="table-responsive pt-2"><table class="table text-sm"><thead><tr><th>Barang</th><th class="text-center">Jml</th><th>Kondisi</th><th>Sumber</th><th class="text-center">Thn</th><th>Ket</th><th class="text-center">Aksi</th></tr></thead><tbody id="tblInventaris"><tr><td colspan="7" class="text-center text-slate-400 py-4 italic">Belum ada barang diinventarisasi</td></tr></tbody></table></div></div></div>
                     </div>
                 </div>
 
-                <!-- PAGE PENGATURAN -->
                 <div id="page-pengaturan" class="app-page d-none">
                     <div class="flex items-center mb-6 gap-3"><div class="bg-white/50 p-1.5 rounded-lg shadow-sm border border-white"><span class="material-symbols-rounded text-2xl text-primary block">settings</span></div><h4 class="mb-0 font-extrabold text-2xl text-slate-800 tracking-tight">Pengaturan Sistem</h4></div>
                     
                     <div class="row">
-                        <!-- 1. IDENTITAS -->
                         <div class="col-md-6 mb-4"><div class="custom-card h-full"><div class="custom-card-header bg-white/40 rounded-t-[1.25rem]">Identitas Lembaga & Kelas</div><div class="custom-card-body pt-4 text-sm"><form onsubmit="savePengaturan(event)"><div class="mb-3"><label class="mb-1 block font-bold ml-1">Nama Instansi / Sekolah</label><input type="text" id="set_sekolah" class="form-control bg-white"></div><div class="mb-3"><label class="mb-1 block font-bold ml-1">Alamat Institusi (Kop Surat)</label><textarea id="set_alamat" class="form-control bg-white" rows="2"></textarea></div><div class="mb-3"><label class="mb-1 block font-bold ml-1">Rombel / Kelas (Misal: Kelas 1A)</label><input type="text" id="set_kelas" class="form-control bg-white"></div><div class="row"><div class="col-6 mb-3"><label class="mb-1 block font-bold ml-1">Nama Wali Kelas</label><input type="text" id="set_guru" class="form-control bg-white"></div><div class="col-6 mb-3"><label class="mb-1 block font-bold ml-1">NIP Wali Kelas</label><input type="text" id="set_nipguru" class="form-control bg-white"></div></div><div class="row"><div class="col-6 mb-4"><label class="mb-1 block font-bold ml-1">Nama Kepala Sekolah</label><input type="text" id="set_kepsek" class="form-control bg-white"></div><div class="col-6 mb-4"><label class="mb-1 block font-bold ml-1">NIP Kepala Sekolah</label><input type="text" id="set_nipkepsek" class="form-control bg-white"></div></div><button type="submit" class="btn btn-primary w-full shadow-sm py-2">Simpan Identitas</button></form></div></div></div>
                         
-                        <!-- 2. KEAMANAN -->
-                        <div class="col-md-6 mb-4"><div class="custom-card h-full"><div class="custom-card-header text-rose-600 bg-rose-50 rounded-t-[1.25rem] border-b border-rose-100/50 dark:bg-rose-900/20 dark:border-rose-900/50 dark:text-rose-400">Otorisasi & Keamanan</div><div class="custom-card-body pt-4 text-sm"><form onsubmit="updateAuth(event)"><div class="mb-3"><label class="mb-1 block font-bold ml-1">Username Saat Ini</label><input type="text" id="auth_old_u" class="form-control bg-white" required></div><div class="mb-3"><label class="mb-1 block font-bold ml-1">Password Saat Ini</label><input type="password" id="auth_old_p" class="form-control bg-white" required></div><hr class="my-5 border-white/60 dark:border-slate-700/50"><div class="mb-3"><label class="mb-1 block font-bold text-primary ml-1">Username Baru</label><input type="text" id="auth_new_u" class="form-control bg-white" required></div><div class="mb-4"><label class="mb-1 block font-bold text-primary ml-1">Password Baru</label><input type="password" id="auth_new_p" class="form-control bg-white" required></div><button type="submit" class="btn btn-danger w-full shadow-sm py-2">Perbarui Login</button></form></div></div></div>
+                        <div class="col-md-6 mb-4"><div class="custom-card h-full"><div class="custom-card-header text-rose-600 bg-rose-50 rounded-t-[1.25rem] border-b border-rose-100/50 dark:bg-rose-900/20 dark:border-rose-900/50 dark:text-rose-400">Otorisasi & Keamanan</div><div class="custom-card-body pt-4 text-sm"><form onsubmit="updateAuth(event)"><div class="mb-3"><label class="mb-1 block font-bold ml-1">Email (Diabaikan, ganti manual via Firebase)</label><input type="text" id="auth_old_u" class="form-control bg-white" placeholder="Tidak diupdate otomatis" disabled></div><div class="mb-3"><label class="mb-1 block font-bold ml-1">Password Saat Ini</label><input type="password" id="auth_old_p" class="form-control bg-white" placeholder="Abaikan, cukup isi password baru di bawah"></div><hr class="my-5 border-white/60 dark:border-slate-700/50"><div class="mb-3"><label class="mb-1 block font-bold text-primary ml-1">Email Baru</label><input type="text" id="auth_new_u" class="form-control bg-white" placeholder="Diabaikan (Ganti via Firebase Console)" disabled></div><div class="mb-4"><label class="mb-1 block font-bold text-primary ml-1">Password Baru</label><input type="password" id="auth_new_p" class="form-control bg-white" required></div><button type="submit" class="btn btn-danger w-full shadow-sm py-2">Perbarui Password Saja</button></form></div></div></div>
                         
-                        <!-- 3. TEMA APLIKASI & MODE -->
                         <div class="col-12 mb-5">
                             <div class="custom-card overflow-hidden">
                                 <div class="custom-card-header border-b border-white/50 bg-white/40 text-sm">Tema Aplikasi & Mode Tampilan</div>
@@ -664,6 +668,47 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="col-12 mb-5">
+                            <div class="custom-card overflow-hidden">
+                                <div class="custom-card-header border-b border-white/50 bg-white/40 text-sm font-extrabold text-blue-700">Salin Data dari Semester Sebelumnya</div>
+                                <div class="custom-card-body pt-4 text-sm">
+                                    <form onsubmit="copyDataSemester(event)">
+                                        <div class="row">
+                                            <div class="col-md-4 mb-3">
+                                                <label class="mb-1 block font-bold ml-1">Tahun Ajaran Sumber</label>
+                                                <select id="copy_ta" class="form-control">
+                                                    <option value="2026-2027">2026/2027</option>
+                                                    <option value="2027-2028">2027/2028</option>
+                                                    <option value="2028-2029">2028/2029</option>
+                                                    <option value="2029-2030">2029/2030</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="mb-1 block font-bold ml-1">Semester Sumber</label>
+                                                <select id="copy_smt" class="form-control">
+                                                    <option value="Ganjil">Ganjil</option>
+                                                    <option value="Genap">Genap</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4 mb-3 flex flex-col justify-end">
+                                                <button type="submit" class="btn btn-primary w-full shadow-sm py-2.5"><span class="material-symbols-rounded mr-1 text-sm">content_copy</span> Tarik Data</button>
+                                            </div>
+                                        </div>
+                                        <label class="mt-2 mb-2 block font-bold ml-1 text-slate-700">Pilih Data yang Akan Disalin (Mencentang berarti menimpa data saat ini):</label>
+                                        <div class="flex flex-wrap gap-4 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200/50 dark:border-slate-700/50">
+                                            <label class="flex items-center cursor-pointer font-semibold text-slate-600 dark:text-slate-300"><input type="checkbox" class="form-check-input mr-2 copy-chk" value="pengaturan" checked> Pengaturan Kelas</label>
+                                            <label class="flex items-center cursor-pointer font-semibold text-slate-600 dark:text-slate-300"><input type="checkbox" class="form-check-input mr-2 copy-chk" value="siswa" checked> Data Siswa</label>
+                                            <label class="flex items-center cursor-pointer font-semibold text-slate-600 dark:text-slate-300"><input type="checkbox" class="form-check-input mr-2 copy-chk" value="mapel" checked> Daftar Mapel</label>
+                                            <label class="flex items-center cursor-pointer font-semibold text-slate-600 dark:text-slate-300"><input type="checkbox" class="form-check-input mr-2 copy-chk" value="jadwal"> Jadwal Mengajar</label>
+                                            <label class="flex items-center cursor-pointer font-semibold text-slate-600 dark:text-slate-300"><input type="checkbox" class="form-check-input mr-2 copy-chk" value="inventaris"> Inventaris</label>
+                                        </div>
+                                        <p class="text-xs text-rose-500 mt-3 font-bold flex items-center bg-rose-50 dark:bg-rose-900/20 p-2 rounded-lg"><span class="material-symbols-rounded text-base mr-1">warning</span> Hati-hati: Data yang dicentang akan ditarik dan menimpa (menghapus) data di semester aktif saat ini secara permanen!</p>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -693,6 +738,39 @@
         </nav>
     </section>
 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // GANTI BAGIAN INI DENGAN CONFIG FIREBASE ANDA
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyAhv764OMxgqRAfRc_g79VTXB38ijQPMQQ",
+            authDomain: "syafii0388-da4b9.firebaseapp.com",
+            projectId: "syafii0388-da4b9",
+            storageBucket: "syafii0388-da4b9.firebasestorage.app",
+            messagingSenderId: "972966640311",
+            appId: "1:972966640311:web:c7350fb190696d11246b32",
+            measurementId: "G-1D78GG10C7"
+        };
+        
+        try {
+            const app = initializeApp(firebaseConfig);
+            window.fbAuth = getAuth(app);
+            window.fbDb = getFirestore(app);
+            
+            window.fbSignIn = signInWithEmailAndPassword;
+            window.fbSignOut = signOut;
+            window.fbUpdatePassword = updatePassword;
+            window.fbDoc = doc;
+            window.fbGetDoc = getDoc;
+            window.fbSetDoc = setDoc;
+            console.log("Firebase berhasil diinisialisasi.");
+        } catch(e) {
+            console.error("Gagal menginisialisasi Firebase. Pastikan config benar.", e);
+        }
+    </script>
     <script>
     (function() {
         'use strict';
@@ -700,93 +778,176 @@
         let activePage = 'dashboard';
         let isDarkMode = localStorage.getItem('theme_mode') === 'dark';
         
+        // UPDATE: Penampung path semester aktif 
+        let activeSemesterPath = localStorage.getItem('z_semester_path') || 'zeroedu';
+        let activeSemesterLabel = localStorage.getItem('z_semester_label') || '-';
+        
         let localDB = {
             pengaturan: { namaSekolah: '', alamat: '', kelas: '', guru: '', nipGuru: '', kepsek: '', nipKepsek: '' },
             siswa: [], mapel: [], jadwal: [], piket: {}, absensi: [], tabungan: [], nilai: {}, jurnal: [], catatan: [], inventaris: []
         };
 
-        // --- SISTEM SINKRONISASI KE GAS ---
-        window.syncToServer = function(collection, dataObj, callback = null) {
+        // --- SISTEM SINKRONISASI KE FIREBASE FIRESTORE ---
+        window.syncToServer = async function(collection, dataObj, callback = null) {
             Swal.fire({title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
-            if(typeof google !== 'undefined' && google.script) {
-                google.script.run.withSuccessHandler(function() {
+            try {
+                if(window.fbSetDoc && window.fbDb) {
+                    // UPDATE: Menyimpan ke activeSemesterPath, bukan lagi hardcoded "zeroedu"
+                    await window.fbSetDoc(window.fbDoc(window.fbDb, activeSemesterPath, collection), { data: JSON.stringify(dataObj) });
                     Swal.fire({icon: 'success', title: 'Tersimpan', showConfirmButton: false, timer: 1000, customClass: { popup: 'glass rounded-3xl' }});
                     if(callback) callback();
-                }).saveCollection(collection, JSON.stringify(dataObj));
-            } else {
-                Swal.fire({icon: 'success', title: 'Tersimpan (Local)', showConfirmButton: false, timer: 1000, customClass: { popup: 'glass rounded-3xl' }});
-                if(callback) callback();
+                } else {
+                    throw new Error("Firebase belum siap/tidak terkonfigurasi dengan benar.");
+                }
+            } catch(e) {
+                Swal.fire({icon: 'error', title: 'Gagal', text: 'Gagal menyimpan: ' + e.message, customClass: { popup: 'glass rounded-3xl' }});
             }
         };
 
-        window.fetchDataServer = function() {
+        window.fetchDataServer = async function() {
             Swal.fire({title: 'Sinkronisasi...', text: 'Mengambil data dari Server', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
-            if(typeof google !== 'undefined' && google.script) {
-                google.script.run.withSuccessHandler(function(response) {
-                    localDB = JSON.parse(response);
-                    applyPengaturan(); loadSelectOptions(); showPage(activePage); renderThemeOptions(); applyThemeMode();
-                    Swal.close();
-                }).getAllData();
-            } else {
+            try {
+                // Reset localDB to prevent data merging from previous semester memory
+                localDB = { pengaturan: { namaSekolah: '', alamat: '', kelas: '', guru: '', nipGuru: '', kepsek: '', nipKepsek: '' }, siswa: [], mapel: [], jadwal: [], piket: {}, absensi: [], tabungan: [], nilai: {}, jurnal: [], catatan: [], inventaris: [] };
+                
+                if(window.fbGetDoc && window.fbDb) {
+                    const collections = ['pengaturan', 'siswa', 'mapel', 'jadwal', 'piket', 'absensi', 'tabungan', 'nilai', 'jurnal', 'catatan', 'inventaris'];
+                    for(let col of collections) {
+                        // UPDATE: Menarik dari activeSemesterPath
+                        let docSnap = await window.fbGetDoc(window.fbDoc(window.fbDb, activeSemesterPath, col));
+                        if(docSnap.exists() && docSnap.data().data) {
+                            localDB[col] = JSON.parse(docSnap.data().data);
+                        }
+                    }
+                }
                 applyPengaturan(); loadSelectOptions(); showPage(activePage); renderThemeOptions(); applyThemeMode();
                 Swal.close();
+            } catch(e) {
+                Swal.fire({icon: 'error', title: 'Gagal', text: 'Gagal memuat data: ' + e.message, customClass: { popup: 'glass rounded-3xl' }});
             }
         };
 
         const Auth = {
             isVerified: function() { return localStorage.getItem('z_token') !== null; },
-            logout: function() { localStorage.removeItem('z_token'); }
+            logout: function() { localStorage.removeItem('z_token'); localStorage.removeItem('z_semester_path'); localStorage.removeItem('z_semester_label'); }
         };
 
-        window.handleLogin = function(e) { 
+        window.handleLogin = async function(e) { 
             e.preventDefault(); 
-            let u = document.getElementById('username').value; let p = document.getElementById('password').value; 
+            let u = document.getElementById('username').value; 
+            let p = document.getElementById('password').value; 
+            
+            // UPDATE: Menangkap nilai TA dan Semester
+            let ta = document.getElementById('loginTahunAjaran').value;
+            let smt = document.getElementById('loginSemester').value;
+            let taLabel = document.getElementById('loginTahunAjaran').options[document.getElementById('loginTahunAjaran').selectedIndex].text;
+            
             Swal.fire({title: 'Memeriksa Kredensial...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
             
-            if(typeof google !== 'undefined' && google.script) {
-                google.script.run.withSuccessHandler(function(isValid) {
-                    if(isValid) {
-                        localStorage.setItem('z_token', 'gas_token');
-                        checkLoginState();
-                        Swal.fire({icon: 'success', title: 'Akses Diterima', showConfirmButton: false, timer: 1200, customClass: { popup: 'glass rounded-3xl' }});
-                    } else {
-                        Swal.fire({icon: 'error', title: 'Ditolak', text: 'Username atau Password salah!', customClass: { popup: 'glass rounded-3xl' }});
-                    }
-                }).verifyLogin(u, p);
-            } else {
-                if (u === 'admin' && p === 'admin123') { 
-                    localStorage.setItem('z_token', 'mock_token'); checkLoginState(); Swal.fire({icon: 'success', title: 'Akses Diterima', showConfirmButton: false, timer: 1200}); 
-                } else { Swal.fire({icon: 'error', title: 'Ditolak', text: 'Gunakan: admin / admin123'}); } 
+            try {
+                if(window.fbSignIn && window.fbAuth) {
+                    let email = u.includes('@') ? u : u + '@zeroedu.com';
+                    await window.fbSignIn(window.fbAuth, email, p);
+                    
+                    // UPDATE: Set Path Semester Aktif
+                    let path = `zeroedu_${ta}_${smt}`;
+                    let label = `${taLabel} - ${smt}`;
+                    localStorage.setItem('z_semester_path', path);
+                    localStorage.setItem('z_semester_label', label);
+                    activeSemesterPath = path;
+                    activeSemesterLabel = label;
+
+                    localStorage.setItem('z_token', 'fb_token');
+                    checkLoginState();
+                    Swal.fire({icon: 'success', title: 'Akses Diterima', showConfirmButton: false, timer: 1200, customClass: { popup: 'glass rounded-3xl' }});
+                } else {
+                    throw new Error("Firebase belum dikonfigurasi.");
+                }
+            } catch(error) {
+                Swal.fire({icon: 'error', title: 'Ditolak', text: 'Username/Email atau Password salah! Pastikan Firebase sudah disetting.', customClass: { popup: 'glass rounded-3xl' }});
             }
         };
         
-        window.logout = function() { Auth.logout(); checkLoginState(); };
+        window.logout = async function() { 
+            if(window.fbSignOut && window.fbAuth) { await window.fbSignOut(window.fbAuth); }
+            Auth.logout(); checkLoginState(); 
+        };
 
         window.checkLoginState = function() {
             let lp = document.getElementById('loginPage'); let ma = document.getElementById('mainApp');
             if(Auth.isVerified()) {
                 lp.classList.add('d-none'); ma.classList.remove('d-none');
+                // Update Label Semester di Topbar
+                if(document.getElementById('topbarSemester')) document.getElementById('topbarSemester').innerText = activeSemesterLabel;
                 fetchDataServer();
             } else { 
                 ma.classList.add('d-none'); lp.classList.remove('d-none'); document.getElementById('loginForm').reset(); 
             }
         };
 
-        window.updateAuth = function(e) {
+        // UPDATE: FITUR COPY DATA SEMESTER
+        window.copyDataSemester = async function(e) {
             e.preventDefault();
-            let oU = document.getElementById('auth_old_u').value; let oP = document.getElementById('auth_old_p').value;
-            let nU = document.getElementById('auth_new_u').value; let nP = document.getElementById('auth_new_p').value;
-            
-            if(typeof google !== 'undefined' && google.script) {
-                Swal.fire({title: 'Memperbarui...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
-                google.script.run.withSuccessHandler(function(res) {
-                    if(res.success) {
-                        Swal.fire({icon: 'success', title: 'Sukses', text: res.message, customClass: { popup: 'glass rounded-3xl' }}).then(() => { e.target.reset(); logout(); });
-                    } else {
-                        Swal.fire({icon: 'error', title: 'Gagal', text: res.message, customClass: { popup: 'glass rounded-3xl' }});
+            let ta = document.getElementById('copy_ta').value;
+            let smt = document.getElementById('copy_smt').value;
+            let sourcePath = `zeroedu_${ta}_${smt}`;
+
+            if (sourcePath === activeSemesterPath) {
+                return Swal.fire({icon: 'warning', title: 'Oops', text: 'Semester sumber dan semester yang sedang aktif sama. Pilih semester yang berbeda!', customClass: { popup: 'glass rounded-3xl' }});
+            }
+
+            let chks = Array.from(document.querySelectorAll('.copy-chk:checked')).map(c => c.value);
+            if(chks.length === 0) return Swal.fire({icon: 'warning', title: 'Pilih Data', text: 'Anda harus memilih minimal satu data yang akan disalin.'});
+
+            Swal.fire({
+                title: 'Yakin Ingin Menarik Data?',
+                text: `Data (${chks.join(', ')}) dari semester sebelumnya akan ditarik dan secara permanen menimpa data di semester yang sedang Anda buka saat ini.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#0b57d0',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Tarik Data',
+                cancelButtonText: 'Batal',
+                customClass: { popup: 'glass rounded-3xl' }
+            }).then(async (result) => {
+                if(result.isConfirmed) {
+                    Swal.fire({title: 'Menyalin Data...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
+                    try {
+                        if(window.fbGetDoc && window.fbDb) {
+                            for(let col of chks) {
+                                // 1. Ambil dari database lama
+                                let docSnap = await window.fbGetDoc(window.fbDoc(window.fbDb, sourcePath, col));
+                                if(docSnap.exists() && docSnap.data().data) {
+                                    // 2. Timpa ke localDB
+                                    localDB[col] = JSON.parse(docSnap.data().data);
+                                    // 3. Simpan langsung ke database aktif
+                                    await window.fbSetDoc(window.fbDoc(window.fbDb, activeSemesterPath, col), { data: JSON.stringify(localDB[col]) });
+                                }
+                            }
+                            Swal.fire({icon: 'success', title: 'Berhasil', text: 'Data berhasil disalin.', customClass: { popup: 'glass rounded-3xl' }}).then(() => {
+                                applyPengaturan(); loadSelectOptions(); loadPageData(activePage);
+                            });
+                        }
+                    } catch(err) {
+                        Swal.fire({icon: 'error', title: 'Gagal', text: err.message, customClass: { popup: 'glass rounded-3xl' }});
                     }
-                }).updateCredentials(oU, oP, nU, nP);
-            } else { Swal.fire('Local Dev', 'Otorisasi tidak didukung di mode lokal', 'info'); }
+                }
+            });
+        };
+
+        window.updateAuth = async function(e) {
+            e.preventDefault();
+            let nP = document.getElementById('auth_new_p').value;
+            Swal.fire({title: 'Memperbarui...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
+            try {
+                if(window.fbAuth && window.fbUpdatePassword) {
+                    const user = window.fbAuth.currentUser;
+                    if(user) {
+                        await window.fbUpdatePassword(user, nP);
+                        Swal.fire({icon: 'success', title: 'Sukses', text: 'Password berhasil diperbarui.', customClass: { popup: 'glass rounded-3xl' }}).then(() => { e.target.reset(); logout(); });
+                    } else { throw new Error("Sesi pengguna tidak valid."); }
+                } else { throw new Error("Firebase belum siap."); }
+            } catch(error) { Swal.fire({icon: 'error', title: 'Gagal', text: error.message, customClass: { popup: 'glass rounded-3xl' }}); }
         };
 
         window.toggleThemeMode = function() { isDarkMode = !isDarkMode; applyThemeMode(); };
@@ -974,7 +1135,6 @@
             }
         }
 
-        // TAMBAHAN FITUR 1: LIHAT DATA SISWA (Pop-up View)
         window.viewSiswa = function(id) { 
             let s = localDB.siswa.find(x => x.id === id); 
             if(!s) return; 
@@ -1060,7 +1220,6 @@
             </td></tr>`).join(''); }
         };
 
-        // TAMBAHAN FITUR 2: EDIT NAMA MAPEL & CASCADE UPDATE
         window.editMapel = function(oldMapel) { 
             Swal.fire({
                 title: 'Edit Mapel', 
@@ -1077,16 +1236,11 @@
                         let idx = localDB.mapel.indexOf(oldMapel); 
                         if(idx > -1) { 
                             localDB.mapel[idx] = newM; 
-                            
-                            // Ubah juga nama mapel di jadwal (Cascade update)
                             localDB.jadwal.forEach(j => { if(j.mapel === oldMapel) j.mapel = newM; }); 
-                            // Ubah key mapel pada data nilai (Cascade update)
                             if(localDB.nilai[oldMapel]) { 
                                 localDB.nilai[newM] = localDB.nilai[oldMapel]; 
                                 delete localDB.nilai[oldMapel]; 
                             } 
-                            
-                            // Proses penyimpanan bertahap agar konsisten di server
                             syncToServer('mapel', localDB.mapel, function(){ 
                                 syncToServer('jadwal', localDB.jadwal, function(){ 
                                     syncToServer('nilai', localDB.nilai, function(){ 
@@ -1102,7 +1256,6 @@
 
         window.saveMapel = function() { let n = document.getElementById('m_nama').value; if(n) { localDB.mapel.push(n); syncToServer('mapel', localDB.mapel, function(){ document.getElementById('m_nama').value=''; renderJadwal(); loadSelectOptions(); }); } };
                 
-        // TAMBAHAN FITUR 3: EDIT SUSUN JADWAL 
         window.editJadwal = function(id) { 
             let j = localDB.jadwal.find(x => x.id === id); 
             if(!j) return; 
@@ -1121,7 +1274,6 @@
             let mapel = document.getElementById('j_mapel').value; 
             
             if(id) { 
-                // Mode Edit Jadwal
                 let idx = localDB.jadwal.findIndex(x => x.id === id); 
                 if(idx > -1) { 
                     localDB.jadwal[idx].hari = hari; 
@@ -1131,7 +1283,6 @@
                 document.getElementById('j_id').value = ''; 
                 document.getElementById('btnSubmitJadwal').innerText = 'Tambah'; 
             } else { 
-                // Mode Tambah Jadwal Baru
                 localDB.jadwal.push({id: 'J'+Date.now(), hari: hari, jam: jam, mapel: mapel}); 
             } 
             
@@ -1140,7 +1291,6 @@
             }); 
         };
         
-                
         window.toggleCustomSelect = function(id) { let container = document.getElementById(id + '_container'); let trigger = document.getElementById(id + '_trigger'); document.querySelectorAll('.custom-select-container').forEach(el => { if(el.id !== id + '_container') { el.classList.remove('open'); el.querySelector('.custom-select-trigger').classList.remove('open'); } }); container.classList.toggle('open'); trigger.classList.toggle('open'); };
         window.selectCustomOption = function(id, value, text) { let container = document.getElementById(id + '_container'); let trigger = document.getElementById(id + '_trigger'); let textElement = document.getElementById(id + '_text'); let inputElement = document.getElementById(id); let options = document.getElementById(id + '_options').querySelectorAll('.custom-option'); textElement.innerText = text; inputElement.value = value; options.forEach(opt => { if (opt.dataset.value === value) opt.classList.add('selected'); else opt.classList.remove('selected'); }); container.classList.remove('open'); trigger.classList.remove('open'); if (id === 'p_hari') renderFormPiket(); };
         document.addEventListener('click', function(e) { if (!e.target.closest('.custom-select-container')) { document.querySelectorAll('.custom-select-container').forEach(container => { container.classList.remove('open'); let trigger = container.querySelector('.custom-select-trigger'); if(trigger) trigger.classList.remove('open'); }); } });
@@ -1504,14 +1654,13 @@
                 text: "Data yang dihapus tidak dapat dikembalikan!",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#ba1a1a', // Warna merah (danger)
-                cancelButtonColor: '#64748b',  // Warna abu-abu
+                confirmButtonColor: '#ba1a1a', 
+                cancelButtonColor: '#64748b',  
                 confirmButtonText: 'Ya, Hapus!',
                 cancelButtonText: 'Batal',
                 customClass: { popup: 'glass rounded-3xl' }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Logika penghapusan berdasarkan koleksi (tabel)
                     if (collectionName === 'siswa') {
                         localDB.siswa = localDB.siswa.filter(s => s.id !== itemId);
                         syncToServer('siswa', localDB.siswa, function() { renderSiswa(); loadSelectOptions(); });
