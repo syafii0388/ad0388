@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZeroEdu - Kelas Digital</title>
+    <title>S Class - Kelas Digital</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0b57d0">
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/syafii0388/Logo/b736145fff516c48313c3df2564632ed222ace83/Logo%20Sekolah.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="S Class">
     <link rel="icon" href="https://raw.githubusercontent.com/syafii0388/Logo/b736145fff516c48313c3df2564632ed222ace83/Logo%20Sekolah.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -286,7 +292,7 @@
         </aside>
 
         <main class="main-content pb-20 md:pb-0">
-            <header class="sticky top-0 z-30 glass px-5 py-3 flex justify-between items-center shadow-sm">
+            <header class<header class="sticky top-0...">="sticky top-0 z-30 glass px-5 py-3 flex justify-between items-center shadow-sm">
                 <div class="flex items-center gap-3">
                     <button id="btnShowSidebar" class="btn-icon bg-white/50 text-slate-600 border-none md:hidden" onclick="toggleSidebar()" title="Tampilkan Menu">
                         <span class="material-symbols-rounded text-xl">menu</span>
@@ -301,6 +307,9 @@
                 <div class="flex items-center gap-3">
                     <button id="btnToggleTheme" onclick="toggleThemeMode()" class="btn-icon bg-white/50 text-slate-600 border border-slate-200/50 shadow-sm shrink-0 w-9 h-9 hover:bg-slate-100" title="Ubah Mode Layar">
                         <span class="material-symbols-rounded text-[20px]" id="iconDarkModeTopbar">light_mode</span>
+                    </button>
+                    <button id="btnInstallApp" onclick="installPWA()" class="hidden btn btn-sm bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-none shadow-sm dark:bg-emerald-900/40 dark:text-emerald-300 dark:hover:bg-emerald-900/60 hidden sm:flex" title="Install Aplikasi">
+                        <span class="material-symbols-rounded mr-1 text-sm">install_desktop</span> Install
                     </button>
                     <div class="text-right hidden sm:block border-l border-slate-200 pl-3 dark:border-slate-700">
                         <div class="font-bold text-xs text-slate-800" id="topbarGuru">-</div>
@@ -1747,6 +1756,40 @@
         document.addEventListener('DOMContentLoaded', function() { setTimeout(checkLoginState, 500); });
 
     })();
+    </script>
+    <script>
+        // Registrasi Service Worker untuk PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => console.log('Service Worker terdaftar:', registration.scope))
+                    .catch(error => console.error('Pendaftaran SW gagal:', error));
+            });
+        }
+
+        // Logika Tombol Install Aplikasi
+        let deferredPrompt;
+        const installBtn = document.getElementById('btnInstallApp');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (installBtn) installBtn.classList.remove('hidden');
+        });
+
+        window.installPWA = async function() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                deferredPrompt = null;
+                if (installBtn) installBtn.classList.add('hidden');
+            }
+        };
+
+        window.addEventListener('appinstalled', () => {
+            if (installBtn) installBtn.classList.add('hidden');
+            deferredPrompt = null;
+        });
     </script>
 </body>
 </html>
