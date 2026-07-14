@@ -1,0 +1,22 @@
+{
+  "name": "ZeroEdu Kelas Digital",
+  "short_name": "ZeroEdu",
+  "description": "Platform Administrasi Digital",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0b57d0",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/syafii0388/Logo/b736145fff516c48313c3df2564632ed222ace83/Logo%20Sekolah.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/syafii0388/Logo/b736145fff516c48313c3df2564632ed222ace83/Logo%20Sekolah.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
