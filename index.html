@@ -226,7 +226,7 @@
                 <div class="bg-primary/10 w-20 h-20 rounded-full mx-auto flex items-center justify-center mb-4 shadow-inner">
                     <img src="https://raw.githubusercontent.com/syafii0388/Logo/b736145fff516c48313c3df2564632ed222ace83/Logo%20Sekolah.png" alt="Logo" class="w-full h-full object-contain rounded-full shadow-inner">
                 </div>
-                <h3 class="loginAppTitle" class="text-2xl font-extrabold text-slate-800 tracking-tight">AD Class</h3>
+                <h3 id="loginAppTitle" class="text-2xl font-extrabold text-slate-800 tracking-tight">AD Class</h3>
                 <p class="text-slate-500 mt-1 font-medium text-sm">Administrasi Kelas Digital</p>
             </div>
             
@@ -285,7 +285,7 @@
                         <img src="https://raw.githubusercontent.com/syafii0388/Logo/b736145fff516c48313c3df2564632ed222ace83/Logo%20Sekolah.png" alt="Logo App" class="w-full h-full object-contain">
                     </div>
                     <div class="overflow-hidden">
-                        <h4 class="font-extrabold text-lg text-slate-800 truncate leading-tight" id>AD Class</h4>
+                        <h4 id="sidebarAppTitle" class="font-extrabold text-lg text-slate-800 truncate leading-tight">AD Class</h4>
                         <small id="sidebarKelas" class="text-primary font-bold block truncate text-xs">id="sidebarKelas"</small>
                     </div>
                 </div>
@@ -1706,8 +1706,8 @@
         
         window.applyPengaturan = function() {
             let n = localDB.pengaturan.namaSekolah || '-'; let g = localDB.pengaturan.guru || '-'; let k = localDB.pengaturan.kelas || '-'; let a = localDB.pengaturan.alamat || '-'; let kp = localDB.pengaturan.kepsek || '-';
-            document.getElementById('loginAppTitle').innerText = n !== '-' ? n : 'AD Class'; document.getElementById('sidebarAppTitle').innerText = n !== '-' ? n : 'AD Class'; document.getElementById('sidebarKelas').innerText = k; document.getElementById('topbarSekolah').innerText = n !== '-' ? n : 'ZeroEdu'; document.getElementById('topbarGuru').innerText = g; document.getElementById('topbarInitial').innerText = g !== '-' ? g.charAt(0).toUpperCase() : 'U';
-            if(document.getElementById('dashHeaderSekolah')) { document.getElementById('dashHeaderSekolah').innerText = n; document.getElementById('dashHeaderAlamat').innerText = a; document.getElementById('dashGridSekolah').innerText = n; document.getElementById('dashGridKelas').innerText = k; document.getElementById('dashGridGuru').innerText = g; document.getElementById('dashGridKepsek').innerText = kp; }
+            const setTextSafe = (id, text) => {let el = document.getElementById(id); if(el) el.innerText = text;};
+            setTextSafe('sidebarKelas', n); setTextSafe('topbarSekolah', n !== '-' ? n : 'AD Class'); setTextSafe('topbarGuru', g); setTextSafe('topbarInitial', g !== '-' ? g.charAt(0).toUpperCase() : 'U'); setTextSafe('dashHeaderSekolah', n); setTextSafe('dashHeaderAlamat', a); setTextSafe('dashGridSekolah', n); setTextSafe('dashGridKelas', k); setTextSafe('dashGridGuru', g); setTextSafe('dashGridKepsek', kp);
         };
         
         window.confirmDelete = function(collectionName, itemId) {
