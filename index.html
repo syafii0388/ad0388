@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZeroEdu - Kelas Digital</title>
+    <title>S Class Digital</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0b57d0">
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/syafii0388/Logo/b736145fff516c48313c3df2564632ed222ace83/Logo%20Sekolah.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="ZeroEdu">
+    <meta name="apple-mobile-web-app-title" content="S Class">
     <link rel="icon" href="https://raw.githubusercontent.com/syafii0388/Logo/b736145fff516c48313c3df2564632ed222ace83/Logo%20Sekolah.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -205,7 +205,7 @@
                 <div class="bg-primary/10 w-20 h-20 rounded-full mx-auto flex items-center justify-center mb-4 shadow-inner">
                     <img src="https://raw.githubusercontent.com/syafii0388/Logo/b736145fff516c48313c3df2564632ed222ace83/Logo%20Sekolah.png" alt="Logo" class="w-full h-full object-contain rounded-full shadow-inner">
                 </div>
-                <h3 id="loginAppTitle" class="text-2xl font-extrabold text-slate-800 tracking-tight">ZeroEdu</h3>
+                <h3 id="loginAppTitle" class="text-2xl font-extrabold text-slate-800 tracking-tight">S Class</h3>
                 <p class="text-slate-500 mt-1 font-medium text-sm">Administrasi Kelas Digital</p>
             </div>
             
@@ -264,7 +264,7 @@
                         <img src="https://raw.githubusercontent.com/syafii0388/Logo/b736145fff516c48313c3df2564632ed222ace83/Logo%20Sekolah.png" alt="Logo App" class="w-full h-full object-contain">
                     </div>
                     <div class="overflow-hidden">
-                        <h4 class="font-extrabold text-lg text-slate-800 truncate leading-tight" id="sidebarAppTitle">ZeroEdu</h4>
+                        <h4 class="font-extrabold text-lg text-slate-800 truncate leading-tight" id="sidebarAppTitle">S Class</h4>
                         <small id="sidebarKelas" class="text-primary font-bold block truncate text-xs">-</small>
                     </div>
                 </div>
@@ -299,7 +299,7 @@
                     </button>
                     
                     <div class="hidden sm:block">
-                        <strong id="topbarSekolah" class="text-lg font-extrabold text-slate-800 tracking-tight">ZeroEdu</strong>
+                        <strong id="topbarSekolah" class="text-lg font-extrabold text-slate-800 tracking-tight">S Class</strong>
                         <span class="ml-2 inline-block px-2 py-0.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 rounded-full text-[10px] font-bold uppercase tracking-wide">Workspace</span>
                         <span id="topbarSemester" class="ml-1 inline-block px-2 py-0.5 bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400 rounded-full text-[10px] font-bold uppercase tracking-wide">-</span>
                     </div>
@@ -793,7 +793,7 @@
         let isDarkMode = localStorage.getItem('theme_mode') === 'dark';
         
         // UPDATE: Penampung path semester aktif 
-        let activeSemesterPath = localStorage.getItem('z_semester_path') || 'zeroedu';
+        let activeSemesterPath = localStorage.getItem('z_semester_path') || 'sclass';
         let activeSemesterLabel = localStorage.getItem('z_semester_label') || '-';
         
         let localDB = {
@@ -806,7 +806,7 @@
             Swal.fire({title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
             try {
                 if(window.fbSetDoc && window.fbDb) {
-                    // UPDATE: Menyimpan ke activeSemesterPath, bukan lagi hardcoded "zeroedu"
+                    // UPDATE: Menyimpan ke activeSemesterPath, bukan lagi hardcoded "sclass"
                     await window.fbSetDoc(window.fbDoc(window.fbDb, activeSemesterPath, collection), { data: JSON.stringify(dataObj) });
                     Swal.fire({icon: 'success', title: 'Tersimpan', showConfirmButton: false, timer: 1000, customClass: { popup: 'glass rounded-3xl' }});
                     if(callback) callback();
@@ -860,11 +860,11 @@
             
             try {
                 if(window.fbSignIn && window.fbAuth) {
-                    let email = u.includes('@') ? u : u + '@zeroedu.com';
+                    let email = u.includes('@') ? u : u + '@sclass.com';
                     await window.fbSignIn(window.fbAuth, email, p);
                     
                     // UPDATE: Set Path Semester Aktif
-                    let path = `zeroedu_${ta}_${smt}`;
+                    let path = `sclass_${ta}_${smt}`;
                     let label = `${taLabel} - ${smt}`;
                     localStorage.setItem('z_semester_path', path);
                     localStorage.setItem('z_semester_label', label);
@@ -904,7 +904,7 @@
             e.preventDefault();
             let ta = document.getElementById('copy_ta').value;
             let smt = document.getElementById('copy_smt').value;
-            let sourcePath = `zeroedu_${ta}_${smt}`;
+            let sourcePath = `sclass_${ta}_${smt}`;
 
             if (sourcePath === activeSemesterPath) {
                 return Swal.fire({icon: 'warning', title: 'Oops', text: 'Semester sumber dan semester yang sedang aktif sama. Pilih semester yang berbeda!', customClass: { popup: 'glass rounded-3xl' }});
@@ -1685,7 +1685,7 @@
         
         window.applyPengaturan = function() {
             let n = localDB.pengaturan.namaSekolah || '-'; let g = localDB.pengaturan.guru || '-'; let k = localDB.pengaturan.kelas || '-'; let a = localDB.pengaturan.alamat || '-'; let kp = localDB.pengaturan.kepsek || '-';
-            document.getElementById('loginAppTitle').innerText = n !== '-' ? n : 'ZeroEdu'; document.getElementById('sidebarAppTitle').innerText = n !== '-' ? n : 'ZeroEdu'; document.getElementById('sidebarKelas').innerText = k; document.getElementById('topbarSekolah').innerText = n !== '-' ? n : 'ZeroEdu'; document.getElementById('topbarGuru').innerText = g; document.getElementById('topbarInitial').innerText = g !== '-' ? g.charAt(0).toUpperCase() : 'U';
+            document.getElementById('loginAppTitle').innerText = n !== '-' ? n : 'S Class'; document.getElementById('sidebarAppTitle').innerText = n !== '-' ? n : 'S Class'; document.getElementById('sidebarKelas').innerText = k; document.getElementById('topbarSekolah').innerText = n !== '-' ? n : 'ZeroEdu'; document.getElementById('topbarGuru').innerText = g; document.getElementById('topbarInitial').innerText = g !== '-' ? g.charAt(0).toUpperCase() : 'U';
             if(document.getElementById('dashHeaderSekolah')) { document.getElementById('dashHeaderSekolah').innerText = n; document.getElementById('dashHeaderAlamat').innerText = a; document.getElementById('dashGridSekolah').innerText = n; document.getElementById('dashGridKelas').innerText = k; document.getElementById('dashGridGuru').innerText = g; document.getElementById('dashGridKepsek').innerText = kp; }
         };
         
