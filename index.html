@@ -315,9 +315,6 @@
                     
                     <div class="hidden sm:block">
                         <strong id="topbarSekolah" class="text-lg font-extrabold text-slate-800 tracking-tight">AD Class</strong>
-                        <select id="adminWorkspace" class="d-none ml-2 form-select bg-rose-50 text-rose-700 border border-rose-200 font-bold text-xs py-0.5 px-2 rounded-full w-auto shadow-sm cursor-pointer" onchange="switchAdminWorkspace()">
-                            <option value="admin">-- Ruang Kerja Admin --</option>
-                        </select>
                         <span class="ml-2 inline-block px-2 py-0.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 rounded-full text-[10px] font-bold uppercase tracking-wide">Workspace</span>
                         <span id="topbarSemester" class="ml-1 inline-block px-2 py-0.5 bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400 rounded-full text-[10px] font-bold uppercase tracking-wide">-</span>
                     </div>
@@ -812,6 +809,9 @@
     </section>
 
     <script type="module">
+        // =========================================================================
+        // 1. IMPORT & INISIALISASI FIREBASE
+        // =========================================================================
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, updatePassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -844,15 +844,14 @@
             window.fbDeleteDoc = deleteDoc;
             window.fbCollection = collection;
             window.fbGetDocs = getDocs;
-            console.log("Firebase & Secondary App berhasil diinisialisasi.");
+            console.log("Firebase berhasil diinisialisasi.");
         } catch(e) {
             console.error("Gagal menginisialisasi Firebase.", e);
         }
-    </script>
-    <script>
-    (function() {
-        'use strict';
 
+        // =========================================================================
+        // 2. LOGIKA APLIKASI UTAMA
+        // =========================================================================
         let activePage = 'dashboard';
         let isDarkMode = localStorage.getItem('theme_mode') === 'dark';
         let activeSemesterPath = localStorage.getItem('z_semester_path') || 'adclass';
@@ -912,13 +911,11 @@
 
                 let email = u.includes('@') ? u : u + '@adclass.com';
                 
-                // 1. Proses Login Firebase Asli
                 await window.fbSignIn(window.fbAuth, email, p);
                 
                 let role = '';
                 let targetGuru = '';
 
-                // 2. Cek Role di Firestore (Koleksi 'app_users')
                 if (u === 'admin') {
                     role = 'admin';
                     targetGuru = 'admin';
@@ -939,7 +936,6 @@
                     targetGuru = u;
                 }
 
-                // 3. Simpan Sesi
                 localStorage.setItem('z_token', 'logged_in');
                 localStorage.setItem('z_role', role);
                 localStorage.setItem('z_username', u);
@@ -973,31 +969,26 @@
             let lp = document.getElementById('loginPage'); 
             let ma = document.getElementById('mainApp');
             let role = localStorage.getItem('z_role');
-            
+    
             if(Auth.isVerified()) {
                 lp.classList.add('d-none'); ma.classList.remove('d-none');
                 if(document.getElementById('topbarSemester')) document.getElementById('topbarSemester').innerText = activeSemesterLabel;
-                
-                // Setup Tampilan Berdasarkan Role
+        
                 let btnAdmin = document.getElementById('menuAdminUsers');
-                let dropAdmin = document.getElementById('adminWorkspace');
-                
+        
                 if (role === 'admin') {
                     btnAdmin.classList.remove('d-none');
-                    dropAdmin.classList.remove('d-none');
-                    loadDaftarGuruAdmin(); // Load data guru untuk admin
+                    loadDaftarGuruAdmin(); 
                 } else {
                     btnAdmin.classList.add('d-none');
-                    dropAdmin.classList.add('d-none');
                 }
 
-                fetchDataServer(); // Load data dashboard / workspace aktif
+                fetchDataServer(); 
             } else { 
                 ma.classList.add('d-none'); lp.classList.remove('d-none'); 
                 document.getElementById('loginForm').reset(); 
             }
         };
-
         window.copyDataSemester = async function(e) {
             e.preventDefault();
             let ta = document.getElementById('copy_ta').value;
@@ -1044,10 +1035,8 @@
                 if(window.fbAuth && window.fbUpdatePassword) {
                     const user = window.fbAuth.currentUser;
                     if(user) {
-                        // 1. Update keamanan asli di Google Firebase
                         await window.fbUpdatePassword(user, nP);
                         
-                        // 2. Sinkronkan ke Firestore agar admin tetap bisa memantau
                         const userRef = window.fbDoc(window.fbDb, 'app_users', uname);
                         const userDoc = await window.fbGetDoc(userRef);
                         if (userDoc.exists()) {
@@ -1696,6 +1685,7 @@
                 <button class="btn-icon bg-rose-50/80 text-rose-600 mx-1" onclick="confirmDelete('jurnal', '${x.id}')"><span class="material-symbols-rounded text-[20px]">delete</span></button>
             </td></tr>`).join(''); 
         };
+        
         window.saveJurnal = function(e){ 
             e.preventDefault(); 
             let id = document.getElementById('jr_id').value;
@@ -1776,6 +1766,7 @@
         window.exportInventaris = function() { let data = [['No', 'Nama Fasilitas / Barang', 'Jumlah', 'Tahun', 'Kondisi', 'Sumber Dana', 'Catatan']]; localDB.inventaris.forEach((v, i) => data.push([i+1, v.nama, v.jml, v.thn, v.kondisi, v.sumber, v.ket])); exportExcelKop(data, 'Buku_Inventaris_Kelas'); };
 
         window.fillFormPengaturan = function() { document.getElementById('set_sekolah').value = localDB.pengaturan.namaSekolah || ''; document.getElementById('set_alamat').value = localDB.pengaturan.alamat || ''; document.getElementById('set_kelas').value = localDB.pengaturan.kelas || ''; document.getElementById('set_guru').value = localDB.pengaturan.guru || ''; document.getElementById('set_nipguru').value = localDB.pengaturan.nipGuru || ''; document.getElementById('set_kepsek').value = localDB.pengaturan.kepsek || ''; document.getElementById('set_nipkepsek').value = localDB.pengaturan.nipKepsek || ''; };
+        
         window.savePengaturan = function(e) { 
             e.preventDefault();
             localDB.pengaturan.namaSekolah = document.getElementById('set_sekolah').value; localDB.pengaturan.alamat = document.getElementById('set_alamat').value; localDB.pengaturan.kelas = document.getElementById('set_kelas').value; localDB.pengaturan.guru = document.getElementById('set_guru').value; localDB.pengaturan.nipGuru = document.getElementById('set_nipguru').value; localDB.pengaturan.kepsek = document.getElementById('set_kepsek').value; localDB.pengaturan.nipKepsek = document.getElementById('set_nipkepsek').value;
@@ -1844,7 +1835,7 @@
         };
 
         // ==========================================
-        // FITUR MANAJEMEN GURU (KHUSUS ADMIN)
+        // 3. FITUR MANAJEMEN GURU (KHUSUS ADMIN)
         // ==========================================
         let localAppUsers = [];
 
@@ -1856,7 +1847,7 @@
                     if(doc.id !== 'admin') localAppUsers.push(doc.data());
                 });
                 renderTableUsers();
-                renderDropdownWorkspace();
+                // Pemanggilan renderDropdownWorkspace() dihapus dari sini
             } catch(e) { console.error("Gagal memuat pengguna:", e); }
         };
 
@@ -1880,32 +1871,6 @@
             }).join('');
         };
 
-        window.renderDropdownWorkspace = function() {
-            let select = document.getElementById('adminWorkspace');
-            let opts = '<option value="admin">-- Ruang Kerja Admin --</option>';
-            localAppUsers.forEach(u => {
-                if (u.status === 'Aktif') opts += `<option value="${u.username}">Lihat Guru: ${u.nama}</option>`;
-            });
-            select.innerHTML = opts;
-    
-            let currentTarget = localStorage.getItem('z_target_guru');
-            if (currentTarget) select.value = currentTarget;
-        };
-
-        window.switchAdminWorkspace = function() {
-            let target = document.getElementById('adminWorkspace').value;
-            let ta = localStorage.getItem('z_ta');
-            let smt = localStorage.getItem('z_smt');
-    
-            activeSemesterPath = `adclass_${target}_${ta}_${smt}`;
-            localStorage.setItem('z_target_guru', target);
-            localStorage.setItem('z_semester_path', activeSemesterPath);
-    
-            fetchDataServer(); // Reload workspace
-            let msg = target === 'admin' ? 'Kembali ke Ruang Admin' : `Menampilkan data administrasi milik ${target}`;
-            Swal.fire({icon: 'success', title: 'Beralih Workspace', text: msg, timer: 1500, showConfirmButton: false, customClass: { popup: 'glass rounded-3xl' }});
-        };
-
         window.showFormUser = function() {
             document.getElementById('modalUser').classList.remove('d-none');
             document.getElementById('userFormTitle').innerText = 'Tambah Guru Baru';
@@ -1914,7 +1879,7 @@
             document.getElementById('u_sekolah').value = '';
             document.getElementById('u_user').value = '';
             document.getElementById('u_user').disabled = false;
-            document.getElementById('wrap_pass').classList.remove('d-none'); // Tampilkan input password
+            document.getElementById('wrap_pass').classList.remove('d-none');
             document.getElementById('u_pass').value = '';
             document.getElementById('u_pass').required = true;
             document.getElementById('u_status').value = 'Aktif';
@@ -1932,7 +1897,7 @@
             document.getElementById('u_sekolah').value = u.sekolah;
             document.getElementById('u_user').value = u.username;
             document.getElementById('u_user').disabled = true; 
-            document.getElementById('wrap_pass').classList.add('d-none'); // Sembunyikan password saat edit
+            document.getElementById('wrap_pass').classList.add('d-none');
             document.getElementById('u_pass').required = false;
             document.getElementById('u_status').value = u.status;
         };
@@ -1943,7 +1908,7 @@
     
             let u_lama = document.getElementById('u_lama').value;
             let username = document.getElementById('u_user').value.replace(/\s+/g, '').toLowerCase();
-            let email = username + '@adclass.com'; // Format email wajib firebase
+            let email = username + '@adclass.com';
     
             let obj = {
                 nama: document.getElementById('u_nama').value,
@@ -1955,21 +1920,16 @@
 
             try {
                 if(u_lama) {
-                    // Proses Edit (Hanya update data di Firestore, password tidak disentuh)
                     await window.fbSetDoc(window.fbDoc(window.fbDb, 'app_users', username), obj);
                     Swal.fire({icon: 'success', title: 'Diperbarui', text: 'Data guru berhasil diubah.', timer: 1500, showConfirmButton: false});
                 } else {
-                    // Proses Tambah Baru (Buat auth di secondary app, lalu simpan firestore)
                     let password = document.getElementById('u_pass').value;
                     if(password.length < 6) throw new Error("Password minimal 6 karakter!");
             
-                    // Cek apakah username sudah ada di tabel lokal agar tidak tertimpa
                     if(localAppUsers.find(x => x.username === username)) throw new Error("Username sudah dipakai!");
 
-                    // Create Firebase Auth User (Menggunakan Secondary App agar Admin tidak logout)
                     await window.fbCreateUser(window.fbSecondaryAuth, email, password);
             
-                    // Simpan Profil ke Firestore
                     await window.fbSetDoc(window.fbDoc(window.fbDb, 'app_users', username), obj);
                     Swal.fire({icon: 'success', title: 'Berhasil', text: 'Akun Guru berhasil dibuat!', timer: 1500, showConfirmButton: false});
                 }
@@ -1989,7 +1949,6 @@
                 if (result.isConfirmed) {
                     try {
                         Swal.fire({title: 'Menghapus...', didOpen: () => Swal.showLoading()});
-                        // Menghapus data akses dari Firestore memblokir login guru secara permanen dari sisi klien
                         await window.fbDeleteDoc(window.fbDoc(window.fbDb, 'app_users', uname));
                         loadDaftarGuruAdmin();
                         Swal.fire('Akses Dihapus!', 'Guru tidak lagi bisa login ke sistem.', 'success');
@@ -2000,11 +1959,15 @@
             });
         };
 
-        // INIT
-        document.addEventListener('DOMContentLoaded', function() { setTimeout(checkLoginState, 500); });
+        // =========================================================================
+        // 4. AWAL EKSEKUSI
+        // =========================================================================
+        document.addEventListener('DOMContentLoaded', function() { 
+            checkLoginState(); 
+        });
 
-    })();
     </script>
+
     <script>
         // Registrasi Service Worker untuk PWA
         if ('serviceWorker' in navigator) {
