@@ -485,8 +485,42 @@
         html.dark .table th { background: #1a2b28 !important; }
         @media (max-width: 768px) {
             body { background: #f7f6f0; }
-            .sidebar { width: 272px; min-width: 272px; left: -272px; padding: 14px 12px; }
-            .sidebar.show { transform: translateX(272px); }
+            /* On phones the complete navigation becomes a thumb-friendly menu sheet,
+               not a shrunken desktop sidebar. */
+            .sidebar {
+                position: fixed; z-index: 60; inset: auto 0 0 0; width: 100%; min-width: 0;
+                height: min(78dvh, 620px); padding: 10px 14px calc(env(safe-area-inset-bottom) + 14px);
+                border: 1px solid rgba(36,49,47,.1); border-bottom: 0;
+                border-radius: 26px 26px 0 0; box-shadow: 0 -16px 45px rgba(26,48,43,.18);
+                transform: translateY(105%); transition: transform .34s cubic-bezier(.2,.8,.2,1);
+            }
+            .sidebar::before {
+                content: ''; display: block; width: 42px; height: 4px; margin: 2px auto 4px;
+                border-radius: 999px; background: #c9d1c9;
+            }
+            .sidebar.show { transform: translateY(0); }
+            .sidebar > div:first-child { padding: 8px 5px 13px !important; }
+            .sidebar > div:first-child button { display: none !important; }
+            .sidebar > div:nth-child(2) {
+                display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;
+                padding: 8px 2px 2px !important; margin-top: 0 !important; align-content: start;
+            }
+            .sidebar > div:nth-child(2) > .nav-item-custom {
+                min-height: 74px; flex-direction: column; align-items: flex-start; justify-content: center;
+                gap: 5px; padding: 11px 12px; margin: 0; border: 1px solid #e7e9e2;
+                background: #fffefa; font-size: .78rem; line-height: 1.1;
+            }
+            .sidebar > div:nth-child(2) > .nav-item-custom .material-symbols-rounded {
+                margin: 0; font-size: 22px; color: #0f766e;
+            }
+            .sidebar > div:nth-child(2) > .nav-item-custom.active {
+                background: #d8f3ee; border-color: #bde7df;
+            }
+            .sidebar > div:nth-child(2) > .nav-item-custom.active::before { display: none; }
+            .sidebar > div:nth-child(2) > .my-2 { display: none; }
+            .sidebar > div:nth-child(2) > #menuAdminUsers {
+                background: #fff4ef; border-color: #f6d9cc;
+            }
             header.glass { min-height: 66px; padding: 10px 16px !important; }
             .main-content { padding-bottom: 92px; }
             .app-page { padding: 4px 14px 0 !important; }
