@@ -700,6 +700,10 @@
                                 </div>
                                 <div id="btn_group_rekap" class="flex items-center gap-2">
                                     <button class="btn btn-sm btn-success flex items-center" onclick="exportRaporExcel()"><span class="material-symbols-rounded text-xs mr-1">table_view</span> Excel</button>
+                                    <input type="file" id="templateInputERapor" class="hidden" accept=".xlsx" onchange="prosesInjectERapor(event)">
+                                    <button class="btn btn-sm btn-indigo flex items-center" onclick="document.getElementById('templateInputERapor').click()">
+                                        <span class="material-symbols-rounded text-xs mr-1">upload_file</span> Inject e-Rapor
+                                    </button>
                                 </div>
                                 <div id="btn_group_ketercapaian" class="flex items-center gap-2 d-none">
                                     <button class="btn btn-sm btn-success flex items-center" onclick="exportKetercapaianExcel()"><span class="material-symbols-rounded text-xs mr-1">download</span> Ekspor</button>
@@ -1817,6 +1821,141 @@
         window.renderRaporMapel = function() { let m = document.getElementById('nr_mapel').value; if(!m) { document.getElementById('nr_head').innerHTML = ''; document.getElementById('nr_body').innerHTML = '<tr><td colspan="12" class="text-center text-slate-400 py-6 font-medium italic">Pilih mapel pada Saring Mapel untuk melihat data</td></tr>'; return; } let mapelData = localDB.nilai[m] || {}; let tpsSet = new Set(); localDB.siswa.forEach(s => { if(mapelData[s.id]) { Object.keys(mapelData[s.id]).forEach(k => { if(k.startsWith('TP') && !k.startsWith('_awal_')) tpsSet.add(k); }); } }); let tps = Array.from(tpsSet).sort((a,b) => parseInt(a.replace('TP','')) - parseInt(b.replace('TP',''))); if (tps.length === 0) { tps = ['TP1']; } let b_tp = parseFloat(document.getElementById('nr_b_tp').value) / 100 || 0; let b_sts = parseFloat(document.getElementById('nr_b_sts').value) / 100 || 0; let b_sas = parseFloat(document.getElementById('nr_b_sas').value) / 100 || 0; let thTps = tps.map(t => `<th class="text-center text-slate-500 min-w-[50px]">${t}</th>`).join(''); document.getElementById('nr_head').innerHTML = ` <tr> <th class="w-12 text-center text-slate-500 border-r border-slate-100 dark:border-slate-700/50">NO</th> <th class="text-left text-slate-500 border-r border-slate-100 dark:border-slate-700/50 min-w-[150px]">NAMA SISWA</th> ${thTps} <th class="text-center text-slate-500 border-l border-slate-100 dark:border-slate-700/50">RERATA TP</th> <th class="text-center text-slate-500 bg-blue-50/50 dark:bg-blue-900/20">STS</th> <th class="text-center text-slate-500 bg-blue-50/50 dark:bg-blue-900/20 border-r border-slate-100 dark:border-slate-700/50">SAS</th> <th class="text-center font-bold text-emerald-700 bg-emerald-50/80 dark:bg-emerald-900/20 w-32">NILAI AKHIR (NA)</th> </tr> `; let html = localDB.siswa.map((s, i) => { let nData = mapelData[s.id] || {}; let sumTp = 0, countTp = 0; let colsTp = tps.map(t => { let v = nData[t]; if(v !== undefined && v !== null && v !== '') { sumTp += parseFloat(v); countTp++; return `<td class="text-center font-semibold text-slate-600">${v}</td>`; } return `<td class="text-center font-semibold text-slate-400">-</td>`; }).join(''); let rerataTp = countTp > 0 ? Math.round(sumTp / countTp) : 0; let sts = nData['STS'] !== undefined && nData['STS'] !== '' ? parseFloat(nData['STS']) : 0; let sas = nData['SAS'] !== undefined && nData['SAS'] !== '' ? parseFloat(nData['SAS']) : 0; let stsDisplay = nData['STS'] !== undefined && nData['STS'] !== '' ? sts : '-'; let sasDisplay = nData['SAS'] !== undefined && nData['SAS'] !== '' ? sas : '-'; let na = Math.round((rerataTp * b_tp) + (sts * b_sts) + (sas * b_sas)); return ` <tr class="border-b border-slate-100 dark:border-slate-700/50"> <td class="text-center font-bold text-slate-400 border-r border-slate-100/50 dark:border-slate-700/50">${i+1}</td> <td class="text-left font-extrabold text-slate-700 border-r border-slate-100/50 dark:border-slate-700/50 whitespace-nowrap">${s.nama}</td> ${colsTp} <td class="text-center font-bold text-slate-600 bg-slate-50/50 dark:bg-slate-800/30 border-l border-slate-100/50 dark:border-slate-700/50">${countTp > 0 ? rerataTp : '-'}</td> <td class="text-center font-bold text-slate-600 bg-blue-50/30 dark:bg-blue-900/10">${stsDisplay}</td> <td class="text-center font-bold text-slate-600 bg-blue-50/30 dark:bg-blue-900/10 border-r border-slate-100/50 dark:border-slate-700/50">${sasDisplay}</td> <td class="text-center font-extrabold text-emerald-600 bg-emerald-50/80 dark:bg-emerald-900/10 text-base">${na}</td> </tr> `; }).join(''); if(html === '') html = '<tr><td colspan="12" class="text-center text-slate-400 py-6 font-medium italic">Belum ada siswa terdaftar</td></tr>'; document.getElementById('nr_body').innerHTML = html; };
         window.renderKetercapaianTP = function() { let m = document.getElementById('nr_mapel').value; if(!m) { document.getElementById('kt_head').innerHTML = ''; document.getElementById('kt_body').innerHTML = '<tr><td colspan="12" class="text-center text-slate-400 py-6 font-medium italic">Pilih mapel pada Saring Mapel untuk melihat data</td></tr>'; return; } let mapelData = localDB.nilai[m] || {}; let tpsSet = new Set(); localDB.siswa.forEach(s => { if(mapelData[s.id]) Object.keys(mapelData[s.id]).forEach(k => { if(k.startsWith('TP') && !k.startsWith('_awal_')) tpsSet.add(k); }); }); let tps = Array.from(tpsSet).sort((a,b) => parseInt(a.replace('TP','')) - parseInt(b.replace('TP',''))); if (tps.length === 0) tps = ['TP1']; let b_tp = parseFloat(document.getElementById('nr_b_tp').value) / 100 || 0; let b_sts = parseFloat(document.getElementById('nr_b_sts').value) / 100 || 0; let b_sas = parseFloat(document.getElementById('nr_b_sas').value) / 100 || 0; let thTps = tps.map(t => `<th class="text-center font-bold text-slate-500 w-20">${t}</th>`).join(''); document.getElementById('kt_head').innerHTML = ` <tr> <th class="w-16 text-center font-bold text-slate-500 uppercase border-r border-slate-100/50 dark:border-slate-700/50">NO</th> <th class="text-left font-bold text-slate-500 uppercase">NAMA SISWA</th> <th class="text-center font-bold text-emerald-700 bg-emerald-50/80 dark:bg-emerald-900/20 w-32 uppercase border-x border-slate-100/50 dark:border-slate-700/50">NILAI AKHIR<br><span class="text-[10px] opacity-70">(NA)</span></th> ${thTps} </tr> `; let html = localDB.siswa.map((s, i) => { let nData = mapelData[s.id] || {}; let sumTp = 0, countTp = 0; let filledTps = []; tps.forEach(t => { let v = nData[t]; if(v !== undefined && v !== null && v !== '') { sumTp += parseFloat(v); countTp++; filledTps.push({tp: t, val: parseFloat(v)}); } }); let rerataTp = countTp > 0 ? Math.round(sumTp / countTp) : 0; let sts = nData['STS'] !== undefined && nData['STS'] !== '' ? parseFloat(nData['STS']) : 0; let sas = nData['SAS'] !== undefined && nData['SAS'] !== '' ? parseFloat(nData['SAS']) : 0; let na = Math.round((rerataTp * b_tp) + (sts * b_sts) + (sas * b_sas)); let tpStatus = {}; tps.forEach(t => tpStatus[t] = '-'); if (filledTps.length === 1) { tpStatus[filledTps[0].tp] = 'T'; } else if (filledTps.length > 1) { let maxVal = Math.max(...filledTps.map(x => x.val)); let minVal = Math.min(...filledTps.map(x => x.val)); if (maxVal > minVal) { filledTps.forEach(x => { if (x.val === maxVal) tpStatus[x.tp] = 'T'; else if (x.val === minVal) tpStatus[x.tp] = 'R'; else tpStatus[x.tp] = ''; }); } else { tpStatus[filledTps[0].tp] = 'T'; tpStatus[filledTps[filledTps.length - 1].tp] = 'R'; for(let k=1; k<filledTps.length-1; k++) tpStatus[filledTps[k].tp] = ''; } } let colsTp = tps.map(t => { let stat = tpStatus[t]; let content = stat === 'T' ? '<span class="text-emerald-500 font-extrabold bg-emerald-50/80 dark:bg-emerald-500/20 dark:text-emerald-400 px-2.5 py-1 rounded-md text-[13px]">T</span>' : (stat === 'R' ? '<span class="text-rose-500 font-extrabold bg-rose-50/80 dark:bg-rose-500/20 dark:text-rose-400 px-2.5 py-1 rounded-md text-[13px]">R</span>' : (stat === '' ? '' : '<span class="text-slate-300 dark:text-slate-600">-</span>')); return `<td class="text-center">${content}</td>`; }).join(''); return ` <tr class="border-b border-slate-100 hover:bg-slate-50/50 dark:border-slate-700/50 transition-colors"> <td class="text-center font-bold text-slate-400 border-r border-slate-100/50 dark:border-slate-700/50 py-4">${i+1}</td> <td class="text-left font-extrabold text-slate-700 py-4 whitespace-nowrap">${s.nama}</td> <td class="text-center font-extrabold text-emerald-600 bg-emerald-50/50 dark:bg-emerald-900/10 border-x border-slate-100/50 dark:border-slate-700/50 text-base py-4">${na}</td> ${colsTp} </tr> `; }).join(''); if(html === '') html = '<tr><td colspan="12" class="text-center text-slate-400 py-6 font-medium italic">Belum ada siswa terdaftar</td></tr>'; document.getElementById('kt_body').innerHTML = html; };
         window.exportRaporExcel = function() { let m = document.getElementById('nr_mapel').value; if(!m) return Swal.fire({icon:'warning', title:'Pilih Mapel'}); let mapelData = localDB.nilai[m] || {}; let tpsSet = new Set(); localDB.siswa.forEach(s => { if(mapelData[s.id]) Object.keys(mapelData[s.id]).forEach(k => { if(k.startsWith('TP') && !k.startsWith('_awal_')) tpsSet.add(k); }); }); let tps = Array.from(tpsSet).sort((a,b) => parseInt(a.replace('TP','')) - parseInt(b.replace('TP',''))); if (tps.length === 0) tps = ['TP1']; let b_tp = parseFloat(document.getElementById('nr_b_tp').value) / 100 || 0; let b_sts = parseFloat(document.getElementById('nr_b_sts').value) / 100 || 0; let b_sas = parseFloat(document.getElementById('nr_b_sas').value) / 100 || 0; let data = [['No', 'Nama Siswa', ...tps, 'Rerata TP', 'STS', 'SAS', 'NILAI AKHIR (NA)']]; localDB.siswa.forEach((s, i) => { let nData = mapelData[s.id] || {}; let sumTp = 0, countTp = 0; let row = [i+1, s.nama]; tps.forEach(t => { let v = nData[t]; if(v !== undefined && v !== null && v !== '') { sumTp += parseFloat(v); countTp++; row.push(v); } else { row.push('-'); } }); let rerataTp = countTp > 0 ? Math.round(sumTp / countTp) : 0; let sts = nData['STS'] !== undefined && nData['STS'] !== '' ? parseFloat(nData['STS']) : 0; let sas = nData['SAS'] !== undefined && nData['SAS'] !== '' ? parseFloat(nData['SAS']) : 0; let na = Math.round((rerataTp * b_tp) + (sts * b_sts) + (sas * b_sas)); row.push(rerataTp, sts, sas, na); data.push(row); }); exportExcelKop(data, 'Rekap_Rapor_' + m); };
+        // --- FUNGSI PEMBANTU STATUS TP (Dari Frontend 1) ---
+        window.getTRStatusArray = function(tpDataArray) {
+            let values = tpDataArray.map(item => item.val);
+            if (values.length === 0) return [];
+    
+            let max = Math.max(...values);
+            let min = Math.min(...values);
+
+            return tpDataArray.map((item, index) => {
+                let status = "";
+                if (max === min) {
+                    if (tpDataArray.length > 1) {
+                        if (index === 0) status = "T";
+                        else if (index === tpDataArray.length - 1) status = "R";
+                    } else { status = "T"; }
+                } else {
+                    if (item.val === max) status = "T";
+                    else if (item.val === min) status = "R";
+                }
+                return { tp: item.tp, status: status };
+            });
+        };
+
+        // --- FUNGSI UTAMA INJECT E-RAPOR ---
+        window.prosesInjectERapor = async function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const namaFileAsli = file.name;
+            // Menggunakan SweetAlert khas Frontend 2 untuk Loading
+            Swal.fire({
+                title: 'Menginjeksi nilai ke format asli...', 
+                allowOutsideClick: false, 
+                didOpen: () => Swal.showLoading(), 
+                customClass: { popup: 'glass rounded-3xl' }
+            });
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const workbook = new ExcelJS.Workbook();
+                await workbook.xlsx.load(arrayBuffer);
+                const worksheet = workbook.worksheets[0]; 
+
+                // Penyesuaian ID filter mapel sesuai Frontend 2
+                const filterMapel = document.getElementById('nr_mapel');
+                if (!filterMapel) throw new Error("Dropdown mapel tidak ditemukan.");
+                const mid = filterMapel.value; 
+                if (!mid || !localDB.nilai[mid]) throw new Error("Data nilai belum dimuat atau kosong.");
+
+                // Penyesuaian ID Bobot Nilai sesuai Frontend 2
+                const wTp = (parseInt(document.getElementById('nr_b_tp')?.value) || 40) / 100;
+                const wSts = (parseInt(document.getElementById('nr_b_sts')?.value) || 30) / 100;
+                const wSas = (parseInt(document.getElementById('nr_b_sas')?.value) || 30) / 100;
+
+                const startRow = 7; 
+
+                // Penyesuaian pemanggilan data localDB
+                localDB.siswa.forEach((siswa, index) => {
+                    let currentRow = startRow + index;
+                    let grades = localDB.nilai[mid][siswa.id] || {};
+                    let tps = ['TP1', 'TP2', 'TP3', 'TP4', 'TP5', 'TP6', 'TP7', 'TP8', 'TP9']; 
+
+                    let validTps = [];
+                    tps.forEach(tp => {
+                        let val = grades[tp + '_magic'] ?? grades[tp];
+                            if (val !== undefined && val !== null && val !== '') {
+                            validTps.push({ tp: tp, val: parseInt(val) });
+                        }
+                    });
+
+                    let sumTp = validTps.reduce((a, b) => a + b.val, 0);
+                    let rataRataTp = validTps.length > 0 ? (sumTp / validTps.length) : 0;
+                    let stsVal = parseInt(grades['STS_magic'] ?? grades['STS'] ?? 0);
+                    let sasVal = parseInt(grades['SAS_magic'] ?? grades['SAS'] ?? 0);
+                    let nilaiAkhir = Math.round((rataRataTp * wTp) + (stsVal * wSts) + (sasVal * wSas));
+
+                    if (!isNaN(nilaiAkhir)) {
+                        let cellG = worksheet.getCell(`G${currentRow}`);
+                        cellG.value = nilaiAkhir;
+                    }
+
+                    if (validTps.length > 0) {
+                        let statuses = window.getTRStatusArray(validTps);
+                        validTps.forEach((item, idx) => {
+                            let colChar = String.fromCharCode(72 + idx); 
+                            let status = statuses.find(s => s.tp === item.tp)?.status || "";
+                            worksheet.getCell(`${colChar}${currentRow}`).value = status;
+                        });
+                    }
+                });
+
+                // Hapus styling error / hidden rows bawaan
+                worksheet.eachRow({ includeEmpty: true }, function(row) {
+                    if (row.number === 4 || row.number === 5) {
+                        row.hidden = true;
+                    }
+                    row.eachCell({ includeEmpty: true }, function(cell) {
+                        if (cell.font) {
+                            cell.font = Object.assign({}, cell.font, { strike: false, underline: false });
+                        }
+                        if (cell.value && Array.isArray(cell.value.richText)) {
+                            cell.value.richText.forEach(rt => {
+                                if (rt.font) {
+                                    rt.font = Object.assign({}, rt.font, { strike: false, underline: false });
+                                }
+                            });
+                        }
+                    });
+                });
+
+                const buffer = await workbook.xlsx.writeBuffer();
+                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        
+                // Menggunakan FileSaver.js bawaan Frontend 2 untuk men-download file
+                saveAs(blob, namaFileAsli);
+        
+                Swal.fire({
+                    icon: 'success', 
+                    title: 'Sukses', 
+                    text: 'Data berhasil diinjeksi, baris tersembunyi & format tetap aman.',
+                    customClass: { popup: 'glass rounded-3xl' }
+                });
+
+            } catch (error) {
+                console.error(error);
+                Swal.fire({ 
+                    icon: 'error', 
+                    title: 'Gagal Memproses', 
+                    text: error.message,
+                    customClass: { popup: 'glass rounded-3xl' } 
+                });
+            } finally {
+                event.target.value = ''; 
+            }
+        };
         window.exportKetercapaianExcel = function() { let m = document.getElementById('nr_mapel').value; if(!m) return Swal.fire({icon:'warning', title:'Pilih Mapel', text:'Silakan pilih mapel terlebih dahulu', customClass:{popup:'glass rounded-3xl'}}); let mapelData = localDB.nilai[m] || {}; let tpsSet = new Set(); localDB.siswa.forEach(s => { if(mapelData[s.id]) Object.keys(mapelData[s.id]).forEach(k => { if(k.startsWith('TP') && !k.startsWith('_awal_')) tpsSet.add(k); }); }); let tps = Array.from(tpsSet).sort((a,b) => parseInt(a.replace('TP','')) - parseInt(b.replace('TP',''))); if (tps.length === 0) tps = ['TP1']; let b_tp = parseFloat(document.getElementById('nr_b_tp').value) / 100 || 0; let b_sts = parseFloat(document.getElementById('nr_b_sts').value) / 100 || 0; let b_sas = parseFloat(document.getElementById('nr_b_sas').value) / 100 || 0; let data = []; let headers = ['NO', 'NAMA SISWA', 'NILAI AKHIR (NA)', ...tps]; data.push(headers); localDB.siswa.forEach((s, i) => { let nData = mapelData[s.id] || {}; let sumTp = 0, countTp = 0; let filledTps = []; tps.forEach(t => { let v = nData[t]; if(v !== undefined && v !== null && v !== '') { sumTp += parseFloat(v); countTp++; filledTps.push({tp: t, val: parseFloat(v)}); } }); let rerataTp = countTp > 0 ? Math.round(sumTp / countTp) : 0; let sts = nData['STS'] !== undefined && nData['STS'] !== '' ? parseFloat(nData['STS']) : 0; let sas = nData['SAS'] !== undefined && nData['SAS'] !== '' ? parseFloat(nData['SAS']) : 0; let na = Math.round((rerataTp * b_tp) + (sts * b_sts) + (sas * b_sas)); let tpStatus = {}; tps.forEach(t => tpStatus[t] = '-'); if (filledTps.length === 1) { tpStatus[filledTps[0].tp] = 'T (Tercapai)'; } else if (filledTps.length > 1) { let maxVal = Math.max(...filledTps.map(x => x.val)); let minVal = Math.min(...filledTps.map(x => x.val)); if (maxVal > minVal) { filledTps.forEach(x => { if (x.val === maxVal) tpStatus[x.tp] = 'T (Tercapai)'; else if (x.val === minVal) tpStatus[x.tp] = 'R (Remedial)'; else tpStatus[x.tp] = ''; }); } else { tpStatus[filledTps[0].tp] = 'T (Tercapai)'; tpStatus[filledTps[filledTps.length - 1].tp] = 'R (Remedial)'; for(let k=1; k<filledTps.length-1; k++) tpStatus[filledTps[k].tp] = ''; } } let row = [i+1, s.nama, na]; tps.forEach(t => row.push(tpStatus[t])); data.push(row); }); exportExcelKop(data, `Ketercapaian_TP_${m}`); };
 
         window.renderJurnal = function() { 
