@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="id">
 <head>
 <meta charset="utf-8"/>
@@ -7,7 +6,7 @@
 <title>AD Class</title>
 <link href="manifest.json" rel="manifest"/>
 <meta content="#0284c7" name="theme-color"/>
-<meta content="2026.07.18.22" name="app-version"/>
+<meta content="2026.07.18.23" name="app-version"/>
 <link href="https://raw.githubusercontent.com/syafii0388/Logo/refs/heads/main/Logo%20Ali%20dan%20Devi.png" rel="apple-touch-icon"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
@@ -1258,6 +1257,17 @@ html.dark #sidebar > .flex-grow.overflow-y-auto::-webkit-scrollbar-thumb:hover {
     }
 }
 
+
+/* ===== AUTH VIEW ISOLATION ===== */
+[hidden] { display: none !important; }
+#loginPage.d-none,
+#mainApp.d-none,
+#loginPage[hidden],
+#mainApp[hidden] { display: none !important; }
+body.auth-view-active #mainApp { display: none !important; }
+body.app-view-active #loginPage { display: none !important; }
+body.auth-view-active { overflow: auto; }
+body.app-view-active { overflow: hidden; }
 </style>
 
 
@@ -1440,7 +1450,7 @@ html.dark #modalSiswa .student-modal-header-simple .student-modal-title{color:#f
 </form>
 </div>
 </section>
-<section class="app-shell d-none" id="mainApp">
+<section class="app-shell d-none" id="mainApp" hidden>
 <div class="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-50 d-none md:hidden" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 <aside class="sidebar glass" id="sidebar">
 <div class="p-5 flex items-center justify-between mt-1">
@@ -2187,32 +2197,46 @@ html.dark #modalSiswa .student-modal-header-simple .student-modal-title{color:#f
             Auth.logout(); checkLoginState(); 
         };
 
+        window.setApplicationView = function(isLoggedIn) {
+            const lp = document.getElementById('loginPage');
+            const ma = document.getElementById('mainApp');
+            if (!lp || !ma) return;
+
+            lp.classList.toggle('d-none', isLoggedIn);
+            ma.classList.toggle('d-none', !isLoggedIn);
+            lp.hidden = isLoggedIn;
+            ma.hidden = !isLoggedIn;
+
+            document.body.classList.toggle('app-view-active', isLoggedIn);
+            document.body.classList.toggle('auth-view-active', !isLoggedIn);
+            lp.setAttribute('aria-hidden', String(isLoggedIn));
+            ma.setAttribute('aria-hidden', String(!isLoggedIn));
+        };
+
         window.checkLoginState = function() {
-            let lp = document.getElementById('loginPage'); 
-            let ma = document.getElementById('mainApp');
-            let role = localStorage.getItem('z_role');
-    
-            if(Auth.isVerified()) {
-                lp.classList.add('d-none'); ma.classList.remove('d-none');
+            const role = localStorage.getItem('z_role');
+            const isLoggedIn = Auth.isVerified();
+            setApplicationView(isLoggedIn);
+
+            if(isLoggedIn) {
                 activePage = 'dashboard';
                 if(document.getElementById('topbarSemester')) document.getElementById('topbarSemester').innerText = activeSemesterLabel;
-        
-                let btnAdmin = document.getElementById('menuAdminUsers');
-        
+
+                const btnAdmin = document.getElementById('menuAdminUsers');
                 const topbarRole = document.getElementById('topbarRole');
                 if (role === 'admin') {
-                    btnAdmin.classList.remove('d-none');
+                    if (btnAdmin) btnAdmin.classList.remove('d-none');
                     if (topbarRole) topbarRole.textContent = 'Administrator';
-                    loadDaftarGuruAdmin(); 
+                    loadDaftarGuruAdmin();
                 } else {
-                    btnAdmin.classList.add('d-none');
+                    if (btnAdmin) btnAdmin.classList.add('d-none');
                     if (topbarRole) topbarRole.textContent = 'Guru';
                 }
 
-                fetchDataServer(); 
-            } else { 
-                ma.classList.add('d-none'); lp.classList.remove('d-none'); 
-                document.getElementById('loginForm').reset(); 
+                fetchDataServer();
+            } else {
+                const loginForm = document.getElementById('loginForm');
+                if (loginForm) loginForm.reset();
             }
         };
 
