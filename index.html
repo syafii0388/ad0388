@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="id">
 <head>
 <meta charset="utf-8"/>
@@ -7,7 +6,7 @@
 <title>AD Class</title>
 <link href="manifest.json" rel="manifest"/>
 <meta content="#0284c7" name="theme-color"/>
-<meta content="2026.07.18.25" name="app-version"/>
+<meta content="2026.07.18.27" name="app-version"/>
 <link href="https://raw.githubusercontent.com/syafii0388/Logo/refs/heads/main/Logo%20Ali%20dan%20Devi.png" rel="apple-touch-icon"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
@@ -1697,9 +1696,6 @@ html.dark #modalSiswa .student-modal-header-simple .student-modal-title{color:#f
 <div class="topbar-school min-w-0">
 <div class="flex items-center gap-2 min-w-0">
 <strong class="text-lg font-extrabold text-slate-800 tracking-tight truncate" id="topbarSekolah">AD Class</strong>
-<span aria-live="polite" class="network-indicator" id="networkIndicator" role="status" title="Status koneksi">
-<span class="network-dot"></span><span id="networkStatusText">Online</span>
-</span>
 <span class="inline-flex items-center px-2 py-0.5 bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300 rounded-full text-[10px] font-bold uppercase tracking-wide whitespace-nowrap" id="topbarSemester">-</span>
 </div>
 </div>
@@ -2215,8 +2211,8 @@ html.dark #modalSiswa .student-modal-header-simple .student-modal-title{color:#f
         // 1. IMPORT & INISIALISASI FIREBASE
         // =========================================================================
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, updatePassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, updatePassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAhv764OMxgqRAfRc_g79VTXB38ijQPMQQ",
@@ -2240,12 +2236,15 @@ html.dark #modalSiswa .student-modal-header-simple .student-modal-title{color:#f
             window.fbCreateUser = createUserWithEmailAndPassword;
             window.fbSignOut = signOut;
             window.fbUpdatePassword = updatePassword;
+            window.fbOnAuthStateChanged = onAuthStateChanged;
             window.fbDoc = doc;
             window.fbGetDoc = getDoc;
             window.fbSetDoc = setDoc;
             window.fbDeleteDoc = deleteDoc;
             window.fbCollection = collection;
             window.fbGetDocs = getDocs;
+            window.fbWriteBatch = writeBatch;
+            window.fbServerTimestamp = serverTimestamp;
             console.log("Firebase berhasil diinisialisasi.");
         } catch(e) {
             console.error("Gagal menginisialisasi Firebase.", e);
@@ -2259,6 +2258,10 @@ html.dark #modalSiswa .student-modal-header-simple .student-modal-title{color:#f
         let activeSemesterPath = localStorage.getItem('z_semester_path') || 'adclass';
         let activeSemesterLabel = localStorage.getItem('z_semester_label') || '-';
         let pendingFrontendWorker = null;
+        let firebaseAuthReady = false;
+        let loginInProgress = false;
+        const cloudRevision = Object.create(null);
+        const pendingSyncPrefix = 'adclass_pending_sync_';
         
         let localDB = {
             pengaturan: { namaSekolah: '', alamat: '', kelas: '', guru: '', nipGuru: '', kepsek: '', nipKepsek: '' },
@@ -2268,26 +2271,89 @@ html.dark #modalSiswa .student-modal-header-simple .student-modal-title{color:#f
         window.syncToServer = async function(collection, dataObj, callback = null) {
             Swal.fire({title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
             const localKey = `adclass_local_${activeSemesterPath}_${collection}`;
+            const pendingKey = `${pendingSyncPrefix}${activeSemesterPath}_${collection}`;
             try {
-                // Selalu simpan salinan lokal terlebih dahulu agar tombol Simpan tetap berfungsi
-                // ketika internet, Firebase, atau autentikasi sedang bermasalah.
                 localStorage.setItem(localKey, JSON.stringify(dataObj));
 
-                if(window.fbSetDoc && window.fbDb && window.fbDoc) {
-                    try {
-                        await window.fbSetDoc(window.fbDoc(window.fbDb, activeSemesterPath, collection), { data: JSON.stringify(dataObj) });
-                    } catch (cloudError) {
-                        console.warn('Penyimpanan cloud gagal; data tetap aman di perangkat.', cloudError);
-                    }
+                if(!navigator.onLine || !window.fbSetDoc || !window.fbDb || !window.fbDoc || !window.fbAuth?.currentUser) {
+                    localStorage.setItem(pendingKey, JSON.stringify({ data: dataObj, queuedAt: Date.now() }));
+                    Swal.fire({icon: 'info', title: 'Tersimpan Offline', text: 'Data aman di perangkat dan akan dikirim saat koneksi kembali.', showConfirmButton: false, timer: 1700, customClass: { popup: 'glass rounded-3xl' }});
+                    if(callback) callback();
+                    return true;
                 }
 
-                Swal.fire({icon: 'success', title: 'Tersimpan', text: navigator.onLine ? 'Data berhasil disimpan.' : 'Data disimpan di perangkat (mode offline).', showConfirmButton: false, timer: 1200, customClass: { popup: 'glass rounded-3xl' }});
+                const ref = window.fbDoc(window.fbDb, activeSemesterPath, collection);
+                const remoteSnap = await window.fbGetDoc(ref);
+                const remoteRevision = remoteSnap.exists() ? Number(remoteSnap.data().revision || 0) : 0;
+                const knownRevision = Number(cloudRevision[collection] || 0);
+
+                if(remoteRevision > knownRevision) {
+                    throw new Error('CONFLICT_DATA_BARU');
+                }
+
+                const nextRevision = Math.max(remoteRevision, knownRevision) + 1;
+                await window.fbSetDoc(ref, {
+                    data: JSON.stringify(dataObj),
+                    revision: nextRevision,
+                    updatedAt: window.fbServerTimestamp ? window.fbServerTimestamp() : new Date().toISOString(),
+                    updatedBy: localStorage.getItem('z_username') || window.fbAuth.currentUser.email || 'unknown'
+                });
+                cloudRevision[collection] = nextRevision;
+                localStorage.removeItem(pendingKey);
+
+                Swal.fire({icon: 'success', title: 'Tersimpan', text: 'Data berhasil disimpan ke Firebase.', showConfirmButton: false, timer: 1200, customClass: { popup: 'glass rounded-3xl' }});
                 if(callback) callback();
                 return true;
             } catch(e) {
+                if(e.message === 'CONFLICT_DATA_BARU') {
+                    localStorage.setItem(pendingKey, JSON.stringify({ data: dataObj, queuedAt: Date.now(), conflict: true }));
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Data Berubah di Perangkat Lain',
+                        text: 'Penyimpanan dihentikan agar data terbaru tidak tertimpa. Muat ulang data lalu ulangi perubahan.',
+                        confirmButtonText: 'Muat Ulang Data',
+                        customClass: { popup: 'glass rounded-3xl' }
+                    }).then(result => { if(result.isConfirmed) fetchDataServer(); });
+                    return false;
+                }
                 console.error('Gagal menyimpan data:', e);
-                Swal.fire({icon: 'error', title: 'Gagal Menyimpan', text: e.message || 'Penyimpanan lokal tidak tersedia.', customClass: { popup: 'glass rounded-3xl' }});
-                return false;
+                localStorage.setItem(pendingKey, JSON.stringify({ data: dataObj, queuedAt: Date.now() }));
+                Swal.fire({icon: 'warning', title: 'Belum Tersinkron', text: 'Data aman di perangkat, tetapi belum berhasil dikirim ke Firebase.', customClass: { popup: 'glass rounded-3xl' }});
+                if(callback) callback();
+                return true;
+            }
+        };
+
+        window.flushPendingSync = async function() {
+            if(!navigator.onLine || !window.fbAuth?.currentUser) return;
+            const prefix = `${pendingSyncPrefix}${activeSemesterPath}_`;
+            const keys = Object.keys(localStorage).filter(key => key.startsWith(prefix));
+            for(const key of keys) {
+                try {
+                    const collection = key.slice(prefix.length);
+                    const payload = JSON.parse(localStorage.getItem(key) || '{}');
+                    if(payload.conflict || typeof payload.data === 'undefined') continue;
+                    const ref = window.fbDoc(window.fbDb, activeSemesterPath, collection);
+                    const remoteSnap = await window.fbGetDoc(ref);
+                    const remoteRevision = remoteSnap.exists() ? Number(remoteSnap.data().revision || 0) : 0;
+                    const knownRevision = Number(cloudRevision[collection] || 0);
+                    if(remoteRevision > knownRevision) {
+                        payload.conflict = true;
+                        localStorage.setItem(key, JSON.stringify(payload));
+                        continue;
+                    }
+                    const nextRevision = Math.max(remoteRevision, knownRevision) + 1;
+                    await window.fbSetDoc(ref, {
+                        data: JSON.stringify(payload.data),
+                        revision: nextRevision,
+                        updatedAt: window.fbServerTimestamp ? window.fbServerTimestamp() : new Date().toISOString(),
+                        updatedBy: localStorage.getItem('z_username') || window.fbAuth.currentUser.email || 'unknown'
+                    });
+                    cloudRevision[collection] = nextRevision;
+                    localStorage.removeItem(key);
+                } catch(err) {
+                    console.warn('Sinkronisasi antrean belum berhasil:', err);
+                }
             }
         };
 
@@ -2301,7 +2367,11 @@ html.dark #modalSiswa .student-modal-header-simple .student-modal-title{color:#f
                     for(let col of collections) {
                         try {
                             let docSnap = await window.fbGetDoc(window.fbDoc(window.fbDb, activeSemesterPath, col));
-                            if(docSnap.exists() && docSnap.data().data) localDB[col] = JSON.parse(docSnap.data().data);
+                            if(docSnap.exists()) {
+                                const remoteData = docSnap.data();
+                                cloudRevision[col] = Number(remoteData.revision || 0);
+                                if(remoteData.data) localDB[col] = JSON.parse(remoteData.data);
+                            }
                         } catch (cloudReadError) {
                             console.warn(`Gagal membaca ${col} dari cloud.`, cloudReadError);
                         }
@@ -2321,12 +2391,13 @@ html.dark #modalSiswa .student-modal-header-simple .student-modal-title{color:#f
                 }
                 applyPengaturan(); loadSelectOptions(); showPage(activePage); applyThemeMode();
                 Swal.close();
+                flushPendingSync();
             } catch(e) { Swal.fire({icon: 'error', title: 'Gagal', text: 'Gagal memuat data: ' + e.message, customClass: { popup: 'glass rounded-3xl' }}); }
         };
 
         const Auth = {
-            isVerified: function() { return localStorage.getItem('z_token') !== null; },
-            logout: function() { localStorage.removeItem('z_token'); localStorage.removeItem('z_semester_path'); localStorage.removeItem('z_semester_label'); localStorage.removeItem('z_role'); localStorage.removeItem('z_username'); localStorage.removeItem('z_ta'); localStorage.removeItem('z_smt'); }
+            isVerified: function() { return Boolean(window.fbAuth && window.fbAuth.currentUser); },
+            logout: function() { localStorage.removeItem('z_semester_path'); localStorage.removeItem('z_semester_label'); localStorage.removeItem('z_role'); localStorage.removeItem('z_username'); localStorage.removeItem('z_ta'); localStorage.removeItem('z_smt'); localStorage.removeItem('z_target_guru'); }
         };
 
         window.handleLogin = async function(e) { 
@@ -2341,6 +2412,7 @@ html.dark #modalSiswa .student-modal-header-simple .student-modal-title{color:#f
             Swal.fire({title: 'Memeriksa Akses...', allowOutsideClick: false, didOpen: () => Swal.showLoading(), customClass: { popup: 'glass rounded-3xl' }});
 
             try {
+                loginInProgress = true;
                 if(!window.fbSignIn || !window.fbAuth || !window.fbGetDoc) throw new Error("Koneksi Firebase belum siap!");
 
                 let email = u.includes('@') ? u : u + '@adclass.com';
@@ -2370,7 +2442,6 @@ html.dark #modalSiswa .student-modal-header-simple .student-modal-title{color:#f
                     targetGuru = u;
                 }
 
-                localStorage.setItem('z_token', 'logged_in');
                 localStorage.setItem('z_role', role);
                 localStorage.setItem('z_username', u);
                 localStorage.setItem('z_ta', ta);
@@ -2386,9 +2457,11 @@ html.dark #modalSiswa .student-modal-header-simple .student-modal-title{color:#f
 
                 activePage = 'dashboard';
                 Swal.fire({icon: 'success', title: 'Berhasil Masuk', showConfirmButton: false, timer: 1200, customClass: { popup: 'glass rounded-3xl' }});
+                loginInProgress = false;
                 setTimeout(() => { checkLoginState(); }, 1200);
 
             } catch(error) {
+                loginInProgress = false;
                 let msg = error.message;
                 if(error.code === 'auth/invalid-credential') msg = "Username atau Password salah!";
                 Swal.fire({icon: 'error', title: 'Akses Ditolak', text: msg, customClass: { popup: 'glass rounded-3xl' }});
@@ -2417,6 +2490,7 @@ html.dark #modalSiswa .student-modal-header-simple .student-modal-title{color:#f
         };
 
         window.checkLoginState = function() {
+            if(!firebaseAuthReady && window.fbAuth) return;
             const role = localStorage.getItem('z_role');
             const isLoggedIn = Auth.isVerified();
             setApplicationView(isLoggedIn);
@@ -2494,7 +2568,7 @@ html.dark #modalSiswa .student-modal-header-simple .student-modal-title{color:#f
             window.location.reload();
         };
 
-        window.addEventListener('online', () => { updateNetworkIndicator(); checkFrontendUpdate(); });
+        window.addEventListener('online', () => { updateNetworkIndicator(); checkFrontendUpdate(); flushPendingSync(); });
         window.addEventListener('offline', updateNetworkIndicator);
         window.copyDataSemester = async function(e) {
             e.preventDefault();
@@ -2515,13 +2589,24 @@ html.dark #modalSiswa .student-modal-header-simple .student-modal-title{color:#f
                     Swal.fire({title: 'Menyalin Data...', allowOutsideClick: false, didOpen: () => Swal.showLoading(), customClass: { popup: 'glass rounded-3xl' }});
                     try {
                         if(window.fbGetDoc && window.fbDb) {
+                            const batch = window.fbWriteBatch(window.fbDb);
+                            const copied = [];
                             for(let col of chks) {
                                 let docSnap = await window.fbGetDoc(window.fbDoc(window.fbDb, sourcePath, col));
                                 if(docSnap.exists() && docSnap.data().data) {
                                     localDB[col] = JSON.parse(docSnap.data().data);
-                                    await window.fbSetDoc(window.fbDoc(window.fbDb, activeSemesterPath, col), { data: JSON.stringify(localDB[col]) });
+                                    const nextRevision = Number(cloudRevision[col] || 0) + 1;
+                                    batch.set(window.fbDoc(window.fbDb, activeSemesterPath, col), {
+                                        data: JSON.stringify(localDB[col]),
+                                        revision: nextRevision,
+                                        updatedAt: window.fbServerTimestamp ? window.fbServerTimestamp() : new Date().toISOString(),
+                                        updatedBy: localStorage.getItem('z_username') || 'unknown'
+                                    });
+                                    copied.push([col, nextRevision]);
                                 }
                             }
+                            await batch.commit();
+                            copied.forEach(([col, revision]) => { cloudRevision[col] = revision; });
                             Swal.fire({icon: 'success', title: 'Berhasil', text: 'Data berhasil disalin.', customClass: { popup: 'glass rounded-3xl' }}).then(() => { applyPengaturan(); loadSelectOptions(); loadPageData(activePage); });
                         }
                     } catch(err) { Swal.fire({icon: 'error', title: 'Gagal', text: err.message, customClass: { popup: 'glass rounded-3xl' }}); }
@@ -2543,14 +2628,6 @@ html.dark #modalSiswa .student-modal-header-simple .student-modal-title{color:#f
                     const user = window.fbAuth.currentUser;
                     if(user) {
                         await window.fbUpdatePassword(user, nP);
-                        
-                        const userRef = window.fbDoc(window.fbDb, 'app_users', uname);
-                        const userDoc = await window.fbGetDoc(userRef);
-                        if (userDoc.exists()) {
-                            let userData = userDoc.data();
-                            userData.password = nP;
-                            await window.fbSetDoc(userRef, userData);
-                        }
                         
                         Swal.fire({icon: 'success', title: 'Sukses', text: 'Password berhasil diperbarui. Silakan masuk kembali.', customClass: { popup: 'glass rounded-3xl' }}).then(() => { e.target.reset(); logout(); });
                     } else { throw new Error("Sesi pengguna tidak valid."); }
@@ -3839,7 +3916,7 @@ html.dark #modalSiswa .student-modal-header-simple .student-modal-title{color:#f
 
             try {
                 if(u_lama) {
-                    await window.fbSetDoc(window.fbDoc(window.fbDb, 'app_users', username), obj);
+                    await window.fbSetDoc(window.fbDoc(window.fbDb, 'app_users', username), obj, { merge: true });
                     Swal.fire({icon: 'success', title: 'Diperbarui', text: 'Data guru berhasil diubah.', timer: 1500, showConfirmButton: false});
                 } else {
                     let password = document.getElementById('u_pass').value;
@@ -3848,6 +3925,7 @@ html.dark #modalSiswa .student-modal-header-simple .student-modal-title{color:#f
                     if(localAppUsers.find(x => x.username === username)) throw new Error("Username sudah dipakai!");
 
                     await window.fbCreateUser(window.fbSecondaryAuth, email, password);
+                    await window.fbSignOut(window.fbSecondaryAuth);
             
                     await window.fbSetDoc(window.fbDoc(window.fbDb, 'app_users', username), obj);
                     Swal.fire({icon: 'success', title: 'Berhasil', text: 'Akun Guru berhasil dibuat!', timer: 1500, showConfirmButton: false});
@@ -3935,7 +4013,58 @@ html.dark #modalSiswa .student-modal-header-simple .student-modal-title{color:#f
             initProfessionalWorkspace();
             updateNetworkIndicator();
             checkFrontendUpdate();
-            checkLoginState(); 
+            setApplicationView(false);
+
+            if(window.fbOnAuthStateChanged && window.fbAuth) {
+                window.fbOnAuthStateChanged(window.fbAuth, async (user) => {
+                    firebaseAuthReady = true;
+                    if(loginInProgress) return;
+                    if(!user) {
+                        Auth.logout();
+                        checkLoginState();
+                        return;
+                    }
+
+                    const authUsername = (user.email || '').split('@')[0].toLowerCase();
+                    const storedUsername = localStorage.getItem('z_username');
+                    const storedPath = localStorage.getItem('z_semester_path');
+                    if(!authUsername || !storedUsername || authUsername !== storedUsername || !storedPath) {
+                        await window.fbSignOut(window.fbAuth);
+                        Auth.logout();
+                        checkLoginState();
+                        return;
+                    }
+
+                    if(authUsername === 'admin') {
+                        localStorage.setItem('z_role', 'admin');
+                    } else {
+                        try {
+                            const profile = await window.fbGetDoc(window.fbDoc(window.fbDb, 'app_users', authUsername));
+                            if(!profile.exists() || profile.data().status === 'Nonaktif') {
+                                await window.fbSignOut(window.fbAuth);
+                                Auth.logout();
+                                Swal.fire({icon: 'warning', title: 'Akses Tidak Aktif', text: 'Akun guru sudah dihapus atau dinonaktifkan oleh Administrator.'});
+                                checkLoginState();
+                                return;
+                            }
+                            localStorage.setItem('z_role', 'guru');
+                        } catch(validationError) {
+                            console.warn('Validasi profil guru gagal.', validationError);
+                            await window.fbSignOut(window.fbAuth);
+                            Auth.logout();
+                            checkLoginState();
+                            return;
+                        }
+                    }
+
+                    activeSemesterPath = storedPath;
+                    activeSemesterLabel = localStorage.getItem('z_semester_label') || '-';
+                    checkLoginState();
+                });
+            } else {
+                firebaseAuthReady = true;
+                checkLoginState();
+            }
         });
 
     </script>
