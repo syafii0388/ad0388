@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="id">
 <head>
 <meta charset="utf-8"/>
@@ -6,7 +7,7 @@
 <title>AD Class</title>
 <link href="manifest.json" rel="manifest"/>
 <meta content="#0284c7" name="theme-color"/>
-<meta content="2026.07.18.23" name="app-version"/>
+<meta content="2026.07.18.24" name="app-version"/>
 <link href="https://raw.githubusercontent.com/syafii0388/Logo/refs/heads/main/Logo%20Ali%20dan%20Devi.png" rel="apple-touch-icon"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
@@ -31,12 +32,12 @@
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<style id="adClassRefactoredStylesV17">/* AD Class consolidated stylesheet — refactored 2026.07.18.14 */
+<style id="adClassStylesV24">/* AD Class consolidated stylesheet — refactored 2026.07.18.14 */
 :root{--md-sys-color-primary:#2563eb;--md-sys-color-primary-container:#dbeafe;--md-sys-color-on-primary-container:#1e3a8a;--sidebar-width:272px;--surface:#fffefa;--surface-subtle:#f7f5ef;--ink:#24312f;--muted:#697572;--line:#e5e8df;--coral:#e97955;--shadow-soft:0 12px 32px rgba(34, 54, 50, 0.08);}
 html{font-size:14px;}
 body{background:radial-gradient(circle at 9% 0%, rgba(255, 210, 150, 0.22), transparent 27rem),
@@ -1268,10 +1269,41 @@ body.auth-view-active #mainApp { display: none !important; }
 body.app-view-active #loginPage { display: none !important; }
 body.auth-view-active { overflow: auto; }
 body.app-view-active { overflow: hidden; }
-</style>
+
+/* Mobile navigation final enforcement: bottom navigation replaces sidebar. */
+@media (max-width: 768px) {
+    #mainApp #sidebar,
+    #mainApp .sidebar,
+    #sidebarOverlay,
+    #btnShowSidebar {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        transform: none !important;
+    }
+    #mainApp .app-shell {
+        display: block !important;
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+    #mainApp .main-content {
+        width: 100% !important;
+        min-width: 0 !important;
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+    }
+    #mainApp header.glass {
+        left: 0 !important;
+        width: 100% !important;
+    }
+    #mainApp .bottom-nav {
+        display: grid !important;
+    }
+}
 
 
-<style id="student-gender-height-fix-v19">
+
+
     #modalSiswa #s_jk {
         height: 54px !important;
         min-height: 54px !important;
@@ -1289,10 +1321,9 @@ body.app-view-active { overflow: hidden; }
             max-height: 54px !important;
         }
     }
-</style>
 
 
-<style id="student-gender-role-fix-v20">
+
     /* Samakan tinggi Gender dengan input Nama Lengkap dan Agama. */
     #modalSiswa #s_jk {
         height: 50px !important;
@@ -1310,10 +1341,9 @@ body.app-view-active { overflow: hidden; }
         max-height: 50px !important;
         box-sizing: border-box !important;
     }
-</style>
 
 
-<style id="student-form-main-panel-v21">
+
 #modalSiswa .student-modal-compact{
   max-width:1100px!important;
   min-height:0!important;
@@ -1396,6 +1426,8 @@ html.dark #modalSiswa .student-modal-header-simple .student-modal-title{color:#f
 }
 </style>
 
+
+
 </head>
 <body class="transition-colors duration-300">
 <section class="auth-page relative overflow-hidden" id="loginPage">
@@ -1450,7 +1482,7 @@ html.dark #modalSiswa .student-modal-header-simple .student-modal-title{color:#f
 </form>
 </div>
 </section>
-<section class="app-shell d-none" id="mainApp" hidden>
+<section class="app-shell d-none" hidden="" id="mainApp">
 <div class="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-50 d-none md:hidden" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 <aside class="sidebar glass" id="sidebar">
 <div class="p-5 flex items-center justify-between mt-1">
@@ -1645,20 +1677,20 @@ html.dark #modalSiswa .student-modal-header-simple .student-modal-title{color:#f
 <div class="modal-content student-modal student-modal-compact">
 <div class="student-modal-header student-modal-header-simple">
 <h3 class="student-modal-title" id="studentFormTitle">Formulir Siswa</h3>
-<button class="student-modal-close-simple" onclick="closeFormSiswa()" type="button" aria-label="Tutup"><span class="material-symbols-rounded">close</span></button>
+<button aria-label="Tutup" class="student-modal-close-simple" onclick="closeFormSiswa()" type="button"><span class="material-symbols-rounded">close</span></button>
 </div>
 <form class="student-form" id="formSiswa" onsubmit="saveSiswa(event)">
 <input id="s_id" type="hidden"/>
 <div class="student-form-scroll student-form-flat-scroll">
 <div class="student-flat-grid">
-<div class="student-field field-no"><label for="s_no">No. Urut</label><input class="form-control" id="s_no" required type="number"/></div>
+<div class="student-field field-no"><label for="s_no">No. Urut</label><input class="form-control" id="s_no" required="" type="number"/></div>
 <div class="student-field field-nis"><label for="s_nis">NIS</label><input class="form-control" id="s_nis" type="text"/></div>
 <div class="student-field field-nisn"><label for="s_nisn">NISN</label><input class="form-control" id="s_nisn" type="text"/></div>
-<div class="student-field field-nama"><label for="s_nama">Nama Lengkap</label><input class="form-control" id="s_nama" required type="text"/></div>
+<div class="student-field field-nama"><label for="s_nama">Nama Lengkap</label><input class="form-control" id="s_nama" required="" type="text"/></div>
 <div class="student-field field-gender"><label for="s_jk">Gender</label><select class="form-select" id="s_jk"><option value="L">Laki-laki (L)</option><option value="P">Perempuan (P)</option></select></div>
 <div class="student-field field-agama"><label for="s_agama">Agama</label><input class="form-control" id="s_agama" type="text" value="Islam"/></div>
 <div class="student-field field-tempat"><label for="s_tplahir">Tempat Lahir</label><input class="form-control" id="s_tplahir" type="text"/></div>
-<div class="student-field field-tanggal"><label for="s_tglahir">Tanggal Lahir</label><input class="form-control" id="s_tglahir" required type="date"/></div>
+<div class="student-field field-tanggal"><label for="s_tglahir">Tanggal Lahir</label><input class="form-control" id="s_tglahir" required="" type="date"/></div>
 <div class="student-field field-hp"><label for="s_hp">Nomor HP/WA</label><input class="form-control" id="s_hp" type="text"/></div>
 <div class="student-field field-ayah"><label for="s_ayah">Nama Ayah</label><input class="form-control" id="s_ayah" type="text"/></div>
 <div class="student-field field-payah"><label for="s_payah">Kerja Ayah</label><input class="form-control" id="s_payah" type="text"/></div>
@@ -2397,19 +2429,43 @@ html.dark #modalSiswa .student-modal-header-simple .student-modal-title{color:#f
             loadPageData(pageName);
         };
 
-        window.toggleSidebar = function() { 
-            let sidebar = document.getElementById('sidebar'); let overlay = document.getElementById('sidebarOverlay'); let btnShow = document.getElementById('btnShowSidebar');
-            if (window.innerWidth <= 768) { sidebar.classList.toggle('show'); overlay.classList.toggle('d-none'); } 
-            else { sidebar.classList.toggle('desktop-hide');
-                if (sidebar.classList.contains('desktop-hide')) { btnShow.classList.remove('hidden', 'md:hidden'); btnShow.style.display = 'inline-flex'; } 
-                else { btnShow.classList.add('hidden', 'md:hidden'); btnShow.style.display = ''; }
+        window.toggleSidebar = function() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const btnShow = document.getElementById('btnShowSidebar');
+
+            if (window.innerWidth <= 768) {
+                if (sidebar) sidebar.classList.remove('show');
+                if (overlay) overlay.classList.add('d-none');
+                return;
             }
-            if (typeof refreshStudentModalLayout === 'function') {
-                refreshStudentModalLayout();
-                window.setTimeout(refreshStudentModalLayout, 320);
+
+            if (!sidebar) return;
+            sidebar.classList.toggle('desktop-hide');
+            if (btnShow) {
+                if (sidebar.classList.contains('desktop-hide')) {
+                    btnShow.classList.remove('hidden', 'md:hidden');
+                    btnShow.style.display = 'inline-flex';
+                } else {
+                    btnShow.classList.add('hidden', 'md:hidden');
+                    btnShow.style.display = '';
+                }
             }
+            if (typeof refreshStudentModalLayout === 'function') refreshStudentModalLayout();
         };
 
+
+        window.enforceMobileNavigation = function() {
+            if (window.innerWidth > 768) return;
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const btnShow = document.getElementById('btnShowSidebar');
+            if (sidebar) sidebar.classList.remove('show', 'desktop-hide');
+            if (overlay) overlay.classList.add('d-none');
+            if (btnShow) btnShow.style.display = 'none';
+        };
+        window.addEventListener('resize', enforceMobileNavigation);
+        document.addEventListener('DOMContentLoaded', enforceMobileNavigation);
 
         window.openMoreMenu = function() {
             const overlay = document.getElementById('moreMenuOverlay');
