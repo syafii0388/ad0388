@@ -6,7 +6,7 @@
 <title>AD Class</title>
 <link href="manifest.json" rel="manifest"/>
 <meta content="#0284c7" name="theme-color"/>
-<meta content="2026.07.22.43" name="app-version"/>
+<meta content="2026.07.22.44" name="app-version"/>
 <link href="https://raw.githubusercontent.com/syafii0388/Logo/refs/heads/main/Logo%20Ali%20dan%20Devi.png" rel="apple-touch-icon"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
@@ -887,11 +887,6 @@ html.dark .attendance-today-detail .attendance-a{color:#fb7185 !important;}
         #page-dashboard > div:first-child #dashHeaderSekolah{color:#ffffff !important;}
 html.dark #page-dashboard > div:first-child h2,
         html.dark #page-dashboard > div:first-child #dashHeaderSekolah{color:#ffffff !important;}
-.jadwal-input-grid{display:grid;grid-template-columns:minmax(0, 1fr) minmax(0, 1fr);gap:14px 12px;align-items:end;}
-.jadwal-field, .jadwal-action{min-width:0;}
-.jadwal-mapel-field{grid-column:1 / 2;}
-.jadwal-action{grid-column:2 / 3;}
-
 #modalSiswa .modal-content.student-modal{max-width:1180px;padding:0;overflow:hidden;background:linear-gradient(180deg, rgba(255,255,255,.98), rgba(246,250,252,.98)) !important;}
 html.dark #modalSiswa .modal-content.student-modal{background:linear-gradient(180deg, rgba(11,30,44,.98), rgba(15,39,55,.98)) !important;}
 .student-modal-header{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:24px 28px 18px;border-bottom:1px solid rgba(148,163,184,.18);background:linear-gradient(135deg, rgba(2,132,199,.10), rgba(5,150,105,.09));}
@@ -1042,11 +1037,6 @@ html.dark #tblAbsensiInput .attendance-select.status-A{background:linear-gradien
 #tblCatatan td.catatan-uraian .catatan-text{display:block;font-size:.96rem !important;line-height:1.55 !important;color:var(--tbl-soft-text) !important;font-style:italic;margin:0 !important;}
 #tblCatatan td.catatan-uraian strong,
         #tblCatatan td.catatan-siswa .catatan-meta{display:none !important;}
-.jadwal-input-grid{grid-template-columns:1fr !important;gap:12px !important;align-items:stretch !important;}
-.jadwal-mapel-field,
-        .jadwal-action{grid-column:1 !important;}
-.jadwal-action .btn{min-height:46px !important;}
-
 #wrap_magic_table .table-responsive{padding:14px !important;}
 #wrap_magic_table .magic-conversion-table{border-collapse:separate !important;border-spacing:0 !important;border:1px solid var(--tbl-head-border) !important;border-radius:18px !important;overflow:hidden !important;background:var(--tbl-row-bg) !important;}
 #wrap_magic_table .magic-conversion-table thead th{border-radius:0 !important;border-left:0 !important;border-top:0 !important;border-right:1px solid var(--tbl-head-border) !important;border-bottom:1px solid var(--tbl-head-border) !important;background:var(--tbl-head-bg) !important;}
@@ -1534,10 +1524,6 @@ html.dark #modalSiswa .student-modal-header-simple .student-modal-title{color:#f
   }
   #page-dashboard .grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-4>.bg-white{padding:14px!important;}
 
-  /* Schedule input vertical on phone */
-  .jadwal-input-grid{display:grid!important;grid-template-columns:1fr!important;gap:12px!important;}
-  .jadwal-mapel-field,.jadwal-action{grid-column:1!important;}
-
   /* Attendance mobile usability */
   #page-absensi .attendance-toolbar{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:12px!important;}
   #page-absensi .attendance-period-picker{width:100%!important;grid-template-columns:max-content minmax(0,1fr)!important;gap:10px!important;}
@@ -1971,7 +1957,8 @@ html.dark #mainApp header.glass .btn-icon{box-shadow:0 6px 15px rgba(0,0,0,.34),
 .jadwal-settings-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:end;}
 .jadwal-settings-grid .jadwal-settings-action{grid-column:1/-1;display:flex;justify-content:flex-end;}
 .jadwal-settings-grid .jadwal-settings-action .btn{min-width:190px;}
-.jadwal-input-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;}
+.jadwal-input-grid{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:14px 12px!important;align-items:end!important;width:100%;}
+.jadwal-field,.jadwal-action{min-width:0;}
 .jadwal-input-grid > .jadwal-field:first-child,.jadwal-input-grid .jadwal-mapel-field{grid-column:1/-1!important;}
 .jadwal-input-grid .jadwal-time-field{grid-column:1/2!important;}
 .jadwal-input-grid .jadwal-action{grid-column:2/3!important;display:flex!important;flex-direction:column;align-self:end!important;}
@@ -1995,14 +1982,20 @@ html.dark #tblJadwal .jadwal-special{background:rgba(14,165,233,.16);color:#bae6
   .jadwal-settings-grid,.jadwal-editor-column .jadwal-settings-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
 }
 @media (max-width:768px){
+  #page-jadwal #jadwal-jadwal .custom-card-body{padding:16px!important;}
   .jadwal-settings-card summary{padding:14px 15px;align-items:flex-start;}
   .jadwal-settings-body{padding:15px;}
   .jadwal-settings-grid,.jadwal-editor-column .jadwal-settings-grid{grid-template-columns:1fr;gap:12px;}
   .jadwal-settings-grid .jadwal-settings-action{grid-column:1;}
   .jadwal-settings-grid .jadwal-settings-action .btn{width:100%;min-width:0;min-height:46px;}
-  .jadwal-input-grid > .jadwal-field:first-child,.jadwal-input-grid .jadwal-mapel-field,.jadwal-input-grid .jadwal-time-field,.jadwal-input-grid .jadwal-action{grid-column:1!important;}
+  .jadwal-input-grid{grid-template-columns:minmax(0,1fr)!important;gap:14px!important;align-items:stretch!important;}
+  .jadwal-input-grid > .jadwal-field:first-child,.jadwal-input-grid .jadwal-mapel-field,.jadwal-input-grid .jadwal-time-field,.jadwal-input-grid .jadwal-action{grid-column:1/-1!important;width:100%!important;}
+  .jadwal-input-grid .form-control,.jadwal-input-grid .form-select,.jadwal-input-grid .jadwal-action .btn{width:100%!important;max-width:none!important;}
+  .jadwal-input-grid .jadwal-action{display:block!important;}
   .jadwal-action-spacer{display:none;}
-  .jadwal-preview-column .table-responsive{max-height:58vh;}
+  .jadwal-preview-column{width:100%;margin-bottom:18px;}
+  .jadwal-preview-column .table-responsive{width:100%!important;max-width:100%!important;max-height:58vh;overflow:auto!important;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;}
+  .jadwal-preview-column .table{min-width:650px!important;}
 }
 </style>
 <style id="submenu-full-width-v40">
